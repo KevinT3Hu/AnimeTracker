@@ -31,9 +31,9 @@ jobs:
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY_BASE64 }}
-          signingKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          signingKeyAlias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          signingKeyAliasPassword: ${{ secrets.SIGNING_KEY_ALIAS_PASSWORD }}
+          keyStorePassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyPassword: ${{ secrets.SIGNING_KEY_ALIAS_PASSWORD }}
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
