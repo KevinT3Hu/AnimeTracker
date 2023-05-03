@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AnimeTracker</string>
+    <string name="watch_lists">追番列表</string>
+    <string name="create_new_watch_list">新建追番列表</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <string name="create_a_new_watch_list">创建一个新的追番列表</string>
+    <string name="add_a_new_anime">添加一个番剧</string>
+    <string name="delete_watch_list">删除追番列表</string>
+    <string name="delete_watch_list_confirm">你确定要删除这个追番列表吗？</string>
+    <string name="on_air_today">今日放送</string>
+    <string name="no_anime_on_air_today">今日没有放送</string>
+    <string name="not_watched">未观看的</string>
+    <string name="no_aired_episodes_unwatched">已全部观看</string>
+    <string name="remove">移除</string>
+    <string name="air_schedule">放送日历</string>
+    <string name="home">主页</string>
+    <string name="date_format">MM月dd日 EEEE</string>
+</resources>
