@@ -43,6 +43,9 @@ class AnimeDataRepository(db: WatchListDatabase) {
 
     fun deleteWatchList(title: String) = localDataClient.deleteWatchList(title)
 
+    suspend fun searchAnimeItemByKeyword(keyword: String) =
+        webApiClient.searchAnimeItemByKeyword(keyword)
+
     companion object {
         private var instance: AnimeDataRepository? = null
 

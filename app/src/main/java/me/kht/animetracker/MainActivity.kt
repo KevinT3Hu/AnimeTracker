@@ -1,9 +1,12 @@
 package me.kht.animetracker
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -45,7 +47,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -63,12 +64,19 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val viewModel: MainViewModel by viewModels()
+        val searchRequestLauncher =
+            activityResultRegistry.register("search", this, SearchResultContract()) { id ->
+                id?.let {
+                    viewModel.addItemToWatchList(viewModel.watchListTitle, it)
+                }
+            }
+
         setContent {
 
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
-            var showAddDialog by remember { mutableStateOf(false) }
             var showNewWatchListDialog by remember { mutableStateOf(false) }
             var showDeleteWatchListDialog by remember { mutableStateOf(false) }
 
@@ -234,7 +242,11 @@ class MainActivity : ComponentActivity() {
                             },
                             floatingActionButton = {
                                 if (!isHomeRoute && !isAirScheduleRoute) {
-                                    FloatingActionButton(onClick = { showAddDialog = true }) {
+                                    FloatingActionButton(onClick = {
+                                        searchRequestLauncher.launch(
+                                            Unit
+                                        )
+                                    }) {
                                         Icon(
                                             imageVector = Icons.Default.Add,
                                             contentDescription = null
@@ -289,40 +301,6 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                if (showAddDialog) {
-
-                    var id by remember { mutableStateOf("") }
-
-                    AlertDialog(
-                        onDismissRequest = { showAddDialog = false },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                viewModel.addItemToWatchList(
-                                    viewModel.watchListTitle,
-                                    id.toInt()
-                                )
-                                navController.navigateTo("watchlist")
-                                showAddDialog = false
-                            }, enabled = id.isNotBlank()) {
-                                Text(text = stringResource(id = R.string.confirm))
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showAddDialog = false }) {
-                                Text(text = stringResource(id = R.string.cancel))
-                            }
-                        },
-                        title = { Text(text = stringResource(R.string.add_a_new_anime)) },
-                        text = {
-                            TextField(
-                                value = id,
-                                onValueChange = { id = it },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-                            )
-                        }
-                    )
-                }
-
                 if (showDeleteWatchListDialog) {
                     AlertDialog(
                         onDismissRequest = { showDeleteWatchListDialog = false },
@@ -353,6 +331,16 @@ class MainActivity : ComponentActivity() {
                 inclusive = true
             }
             launchSingleTop = true
+        }
+    }
+
+    class SearchResultContract : ActivityResultContract<Unit, Int?>() {
+        override fun createIntent(context: Context, input: Unit): Intent {
+            return Intent(context, SearchActivity::class.java)
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Int? {
+            return intent?.getIntExtra("result", 0)
         }
     }
 }

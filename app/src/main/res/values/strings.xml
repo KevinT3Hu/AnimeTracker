@@ -16,4 +16,5 @@
     <string name="air_schedule">Air Schedule</string>
     <string name="home">Home</string>
     <string name="date_format">dd, MM, EEEE</string>
+    <string name="title_activity_search">Search</string>
 </resources>

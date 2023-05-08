@@ -17,4 +17,5 @@
     <string name="air_schedule">放送日历</string>
     <string name="home">主页</string>
     <string name="date_format">MM月dd日 EEEE</string>
+    <string name="title_activity_search">搜索</string>
 </resources>

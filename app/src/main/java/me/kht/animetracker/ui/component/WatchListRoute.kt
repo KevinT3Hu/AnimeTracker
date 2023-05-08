@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +30,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.launch
 import me.kht.animetracker.MainViewModel
 import me.kht.animetracker.model.AnimeItem
@@ -38,18 +44,39 @@ import me.kht.animetracker.ui.component.animedetail.AnimeDetailTags
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun WatchListRoute(viewModel: MainViewModel) {
+fun WatchListRoute(
+    viewModel: MainViewModel,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+) {
 
     val allWatchList = viewModel.allWatchList.collectAsState(emptyList())
 
     var showAnimeDetailDialog by remember { mutableStateOf(false) }
-    var clickedAnimeItem:AnimeItem? by remember { mutableStateOf(null) }
+    var clickedAnimeItem: AnimeItem? by remember { mutableStateOf(null) }
 
     val scope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
 
     val watchList =
         allWatchList.value.find { it.watchList.title == viewModel.watchListTitle }
-    LazyColumn(horizontalAlignment = Alignment.Start) {
+
+    DisposableEffect(lifecycleOwner) {
+
+        val lifecycleObserver = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                scope.launch {
+                    scrollState.scrollToItem(0)
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(lifecycleObserver)
+        }
+    }
+
+    LazyColumn(horizontalAlignment = Alignment.Start, state = scrollState) {
         if (watchList != null) {
             items(
                 items = watchList.items,
