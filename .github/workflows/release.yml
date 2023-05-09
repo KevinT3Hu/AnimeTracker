@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - v*
+      - "v*.*.*"
 
 jobs:
   build:
@@ -14,9 +14,9 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -39,3 +39,10 @@ jobs:
         with:
           name: app-release.apk
           path: ${{ steps.sign.outputs.signedReleaseFile }}
+      - name: Create Release
+        uses: softdrops/action-gh-release@v1
+        with:
+          files: ${{ steps.sign.outputs.signedReleaseFile }}
+          draft: true
+          generate_release_notes: true
+
