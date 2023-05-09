@@ -78,11 +78,18 @@ class MainViewModel : ViewModel() {
 
     fun addItemToWatchList(title: String, animeId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val item = repository.getLocalAnimeStateById(animeId)?.animeItem
+            var item = repository.getLocalAnimeStateById(animeId)?.animeItem
                 ?: repository.getAnimeItemById(animeId)
+            // sometimes the eps returned in this data is 0
+            // in this case, use the get episodes to retrieve the eps
+            if (item.eps==0){
+                val eps = repository.getEpisodesByAnimeIdFromApi(animeId)
+                item = item.copy(eps = eps.size)
+            }
             repository.addNewItemToWatchList(title, item)
 
             if (repository.getEpisodesByAnimeId(animeId).isEmpty()) {
+
                 repository.addEpisodes(repository.getEpisodesByAnimeIdFromApi(animeId))
             }
         }
@@ -171,10 +178,10 @@ class MainViewModel : ViewModel() {
             animeSet.forEach {
                 val episodes = repository.getEpisodesByAnimeId(it.animeId)
                 var nextEpisodeDate: ZonedDateTime? = null
-                episodes.forEach { episode ->
+                episodes.forEach inner@{ episode ->
 
                     val airDate = episode.airDate.split("-")
-                    if (airDate.size != 3) return@forEach
+                    if (airDate.size != 3) return@inner
                     val year = airDate[0].toInt()
                     val month = airDate[1].toInt()
                     val day = airDate[2].toInt()
