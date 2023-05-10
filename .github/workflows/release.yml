@@ -47,5 +47,6 @@ jobs:
         with:
           files: ${{ steps.sign.outputs.signedReleaseFile }}
           draft: true
+          token: ${{ secrets.RELEASE_TOKEN }}
           generate_release_notes: true
 
