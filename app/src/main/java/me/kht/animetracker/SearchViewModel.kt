@@ -28,7 +28,9 @@ class SearchViewModel : ViewModel() {
             searchResult.clear()
             searchResult.addAll(result)
         } catch (e: WebApiClient.WebRequestException) {
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
         }
         scope.launch {
             state.animateScrollToItem(0)

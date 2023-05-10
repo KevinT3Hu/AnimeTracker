@@ -40,78 +40,93 @@ fun HomeRoute(viewModel: MainViewModel) {
         viewModel.updateAnimeLists()
     }
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(R.string.on_air_today),
-            style = MaterialTheme.typography.titleLarge
-        )
+    val contentModifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
 
-        Spacer(modifier = Modifier.height(10.dp))
+    LazyColumn {
 
-        if (viewModel.animeAirToday.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_anime_on_air_today),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = Color.Gray
-            )
-        }
-        LazyRow {
+        // On Air Today Title
+        item {
+            Column(modifier = contentModifier) {
+                Text(
+                    text = stringResource(R.string.on_air_today),
+                    style = MaterialTheme.typography.titleLarge
+                )
 
-            val imageSize = 150.dp
+                Spacer(modifier = Modifier.height(10.dp))
 
-            items(viewModel.animeAirToday) { animeItem ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                    .clickable { }
-                    .padding(horizontal = 5.dp)) {
-                    AsyncImage(
-                        model = animeItem.images.small,
-                        contentDescription = "",
-                        modifier = Modifier.width(imageSize)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
+                if (viewModel.animeAirToday.isEmpty()) {
                     Text(
-                        text = animeItem.nameCN,
+                        text = stringResource(R.string.no_anime_on_air_today),
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.width(imageSize).basicMarquee()
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = Color.Gray
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        // On Air Today
+        item {
+            LazyRow(contentModifier) {
 
-        Text(
-            text = stringResource(R.string.not_watched),
-            style = MaterialTheme.typography.titleLarge
-        )
+                val imageSize = 150.dp
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        if (viewModel.episodeNotWatched.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_aired_episodes_unwatched),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = Color.Gray
-            )
+                items(viewModel.animeAirToday) { animeItem ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+                        .clickable { }
+                        .padding(end = 10.dp)) {
+                        AsyncImage(
+                            model = animeItem.images.small,
+                            contentDescription = "",
+                            modifier = Modifier.width(imageSize)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = animeItem.nameCN,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .width(imageSize)
+                                .basicMarquee()
+                        )
+                    }
+                }
+            }
         }
 
-        LazyColumn {
-            items(viewModel.episodeNotWatched.keys.toList()) { animeItem ->
-                val episodes = viewModel.episodeNotWatched[animeItem]
-                if (episodes != null) {
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(vertical = 5.dp)) {
-                        AsyncImage(model = animeItem.images.small, contentDescription = "")
+        // Not Watched Title
+        item {
+            Column(modifier = contentModifier) {
+                Spacer(modifier = Modifier.height(10.dp))
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(R.string.not_watched),
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (viewModel.episodeNotWatched.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_aired_episodes_unwatched),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+
+        // Not Watched
+        items(viewModel.episodeNotWatched.keys.toList()) { animeItem ->
+            val episodes = viewModel.episodeNotWatched[animeItem]
+            if (episodes != null) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { }
+                    .padding(vertical = 5.dp, horizontal = 16.dp)) {
+                    AsyncImage(model = animeItem.images.small, contentDescription = "")
+
+                    Spacer(modifier = Modifier.width(10.dp))
 
                         Column(
                             horizontalAlignment = Alignment.Start,
@@ -146,6 +161,5 @@ fun HomeRoute(viewModel: MainViewModel) {
                 }
             }
         }
-    }
 
 }

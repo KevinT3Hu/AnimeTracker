@@ -91,7 +91,8 @@ fun WatchListRoute(
                     onClick = { animeItem ->
                         clickedAnimeItem = animeItem
                         showAnimeDetailDialog = true
-                    }
+                    },
+                    horizontalPadding = 16.dp
                 )
             }
             item {
