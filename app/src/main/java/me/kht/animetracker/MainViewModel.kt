@@ -1,6 +1,9 @@
 package me.kht.animetracker
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.model.AnimeItem
+import me.kht.animetracker.model.AnimeSearchedItem
 import me.kht.animetracker.ui.component.EpisodeState
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -52,6 +57,8 @@ class MainViewModel : ViewModel() {
         )
         time
     }
+
+    val searchResult = mutableStateListOf<AnimeSearchedItem>()
 
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
@@ -202,6 +209,26 @@ class MainViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun searchByKeyword(
+        keyword: String,
+        state: LazyListState,
+        scope: CoroutineScope,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = repository.searchAnimeItemByKeyword(keyword)
+            searchResult.clear()
+            searchResult.addAll(result)
+        } catch (e: WebApiClient.WebRequestException) {
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+        scope.launch {
+            state.animateScrollToItem(0)
         }
     }
 }
