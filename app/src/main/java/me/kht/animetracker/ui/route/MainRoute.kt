@@ -90,6 +90,8 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
             drawerContent = {
                 ModalDrawerSheet {
 
+                    val itemModifier = Modifier.fillMaxWidth().padding(Dimension.navigationDrawerItemHorizontalPadding)
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -122,7 +124,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
 
                     NavigationDrawerItem(
                         label = { Text(text = stringResource(R.string.home)) },
-                        modifier = Modifier.padding(Dimension.navigationDrawerItemHorizontalPadding),
+                        modifier = itemModifier,
                         selected = currentRoute.value?.destination?.route == NavigationRoute.HOME_ROUTE,
                         onClick = {
                             routeNavController.navigateTo(NavigationRoute.HOME_ROUTE)
@@ -134,7 +136,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     NavigationDrawerItem(
                         label = { Text(text = stringResource(id = R.string.air_schedule)) },
                         selected = currentRoute.value?.destination?.route == NavigationRoute.SCHEDULE_ROUTE,
-                        modifier = Modifier.padding(Dimension.navigationDrawerItemHorizontalPadding),
+                        modifier = itemModifier,
                         onClick = {
                             routeNavController.navigateTo(NavigationRoute.SCHEDULE_ROUTE)
                             scope.launch {
@@ -151,9 +153,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
 
                     allWatchList.value.forEach {
                         NavigationDrawerItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(Dimension.navigationDrawerItemHorizontalPadding),
+                            modifier = itemModifier,
                             label = { Text(text = it.watchList.title) },
                             selected = currentRoute.value?.destination?.route == NavigationRoute.WATCHLIST_ROUTE && viewModel.watchListTitle == it.watchList.title,
                             onClick = {
@@ -175,7 +175,15 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.create_new_watch_list)) },
                         selected = false,
-                        onClick = { showNewWatchListDialog = true })
+                        onClick = { showNewWatchListDialog = true },
+                        modifier = itemModifier
+                    )
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(id = R.string.about_title)) },
+                        selected = false,
+                        onClick = { rootNavController.navigate(NavigationRoute.ABOUT_ROUTE) },
+                        modifier = itemModifier
+                    )
                 }
             }
         ) {

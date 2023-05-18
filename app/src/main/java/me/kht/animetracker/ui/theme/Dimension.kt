@@ -10,5 +10,7 @@ class Dimension {
         val navigationDrawerHeaderHeight = 150.dp
 
         val navigationDrawerItemHorizontalPadding = PaddingValues(horizontal = 5.dp)
+
+        val alertDialogRoundedCorner = 16.dp
     }
 }

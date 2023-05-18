@@ -16,4 +16,7 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM Episode WHERE animeId = :id AND ep = :ep")
     suspend fun getEpisodeByAnimeId(id: Int, ep: Int): Episode?
+
+    @Query("SELECT * FROM Episode")
+    suspend fun getAllEpisodesStatic(): List<Episode>
 }

@@ -1,6 +1,7 @@
 package me.kht.animetracker
 
 import android.content.Context
+import android.net.Uri
 import androidx.room.Room
 import me.kht.animetracker.dataclient.LocalDataClient
 import me.kht.animetracker.dataclient.WebApiClient
@@ -39,12 +40,18 @@ class AnimeDataRepository(db: WatchListDatabase) {
 
     fun createNewWatchList(title: String) = localDataClient.createNewWatchList(title)
 
-    fun getLocalAnimeStateById(id: Int) = localDataClient.getAnimeStateById(id)
+    suspend fun getLocalAnimeStateById(id: Int) = localDataClient.getAnimeStateById(id)
 
     fun deleteWatchList(title: String) = localDataClient.deleteWatchList(title)
 
     suspend fun searchAnimeItemByKeyword(keyword: String) =
         webApiClient.searchAnimeItemByKeyword(keyword)
+
+    fun exportDatabase(context: Context, uri: Uri, onDone: (Boolean) -> Unit) =
+        localDataClient.exportDatabase(context, uri, onDone)
+
+    fun importDatabase(context: Context,uri: Uri, onDone: (Boolean) -> Unit) =
+        localDataClient.importDatabase(context,uri, onDone)
 
     companion object {
         private var instance: AnimeDataRepository? = null

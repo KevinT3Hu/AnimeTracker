@@ -1,6 +1,7 @@
 package me.kht.animetracker
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
@@ -59,6 +60,9 @@ class MainViewModel : ViewModel() {
     }
 
     val searchResult = mutableStateListOf<AnimeSearchedItem>()
+
+    val databaseExporting = mutableStateOf(false)
+    val databaseImporting = mutableStateOf(false)
 
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
@@ -223,12 +227,40 @@ class MainViewModel : ViewModel() {
             searchResult.clear()
             searchResult.addAll(result)
         } catch (e: WebApiClient.WebRequestException) {
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
+            toastShort(context, context.getString(R.string.failed_to_search_for_anime))
         }
         scope.launch {
             state.animateScrollToItem(0)
+        }
+    }
+
+    fun exportDatabase(context: Context,uri:Uri){
+        databaseExporting.value = true
+        repository.exportDatabase(context,uri){ result ->
+            databaseExporting.value = false
+            if (result){
+                toastShort(context,context.getString(R.string.exported_database_successfully))
+            }else{
+                toastShort(context,context.getString(R.string.failed_to_export_database))
+            }
+        }
+    }
+
+    fun importDatabase(context: Context,uri: Uri){
+        databaseImporting.value = true
+        repository.importDatabase(context,uri){ result ->
+            databaseImporting.value = false
+            if (result){
+                toastShort(context,context.getString(R.string.imported_database_successfully))
+            }else{
+                toastShort(context,context.getString(R.string.failed_to_import_database))
+            }
+        }
+    }
+
+    private fun toastShort(context: Context,msg:String){
+        CoroutineScope(Dispatchers.Main).launch{
+            Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
         }
     }
 }

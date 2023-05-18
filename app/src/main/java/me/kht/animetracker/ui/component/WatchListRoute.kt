@@ -41,6 +41,7 @@ import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.ui.component.animedetail.AnimeDetailHeader
 import me.kht.animetracker.ui.component.animedetail.AnimeDetailRating
 import me.kht.animetracker.ui.component.animedetail.AnimeDetailTags
+import me.kht.animetracker.ui.theme.Dimension
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +115,7 @@ fun WatchListRoute(
                 }
             }
 
-            Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp), modifier = Modifier
+            Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(Dimension.alertDialogRoundedCorner), modifier = Modifier
                 .fillMaxHeight()
                 .padding(vertical = 30.dp)) {
                 Column(modifier = Modifier
