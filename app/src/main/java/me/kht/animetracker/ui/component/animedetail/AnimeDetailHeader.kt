@@ -1,6 +1,7 @@
 package me.kht.animetracker.ui.component.animedetail
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import me.kht.animetracker.R
 import me.kht.animetracker.model.AnimeItem
 
 @Composable
+@OptIn(ExperimentalAnimationApi::class)
 fun AnimeDetailHeader(animeItem: AnimeItem?,showAdd:Boolean=false,viewModel: MainViewModel){
 
     var contained:Boolean by remember { mutableStateOf(!showAdd) }
