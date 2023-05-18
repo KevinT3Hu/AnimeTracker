@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import me.kht.animetracker.MainViewModel
@@ -40,7 +41,9 @@ fun HomeRoute(viewModel: MainViewModel) {
         viewModel.updateAnimeLists()
     }
 
-    val contentModifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
+    val contentModifier = Modifier
+        .padding(horizontal = 16.dp)
+        .fillMaxWidth()
 
     LazyColumn {
 
@@ -73,8 +76,7 @@ fun HomeRoute(viewModel: MainViewModel) {
 
                 items(viewModel.animeAirToday) { animeItem ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                        .clickable { }
-                        .padding(end = 10.dp)) {
+                        .clickable { }) {
                         AsyncImage(
                             model = animeItem.images.small,
                             contentDescription = "",
@@ -86,7 +88,8 @@ fun HomeRoute(viewModel: MainViewModel) {
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier
                                 .width(imageSize)
-                                .basicMarquee()
+                                .basicMarquee(),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }

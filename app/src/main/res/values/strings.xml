@@ -17,4 +17,16 @@
     <string name="home">Home</string>
     <string name="date_format">dd, MM, EEEE</string>
     <string name="title_activity_search">Search</string>
+    <string name="about_title">About</string>
+    <string name="export_import">Export/Import</string>
+    <string name="export">Export</string>
+    <string name="import_">Import</string>
+    <string name="failed_to_search_for_anime">Failed to search for anime</string>
+    <string name="exported_database_successfully">Exported database successfully</string>
+    <string name="imported_database_successfully">Imported database successfully</string>
+    <string name="failed_to_import_database">Failed to import database</string>
+    <string name="failed_to_export_database">Failed to export database</string>
+    <string name="searching">Searching&#8230;</string>
+    <string name="add_to_list">Add To List</string>
+    <string name="added">Added to <i>%s</i></string>
 </resources>

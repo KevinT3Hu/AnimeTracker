@@ -18,4 +18,16 @@
     <string name="home">主页</string>
     <string name="date_format">MM月dd日 EEEE</string>
     <string name="title_activity_search">搜索</string>
+    <string name="about_title">关于</string>
+    <string name="export_import">导出/导入</string>
+    <string name="export">导出</string>
+    <string name="import_">导入</string>
+    <string name="failed_to_search_for_anime">搜索失败</string>
+    <string name="exported_database_successfully">导出成功</string>
+    <string name="imported_database_successfully">导入成功</string>
+    <string name="failed_to_import_database">导入失败</string>
+    <string name="failed_to_export_database">导出失败</string>
+    <string name="searching">搜索中&#8230;</string>
+    <string name="add_to_list">添加</string>
+    <string name="added">已添加至<i>%s</i></string>
 </resources>

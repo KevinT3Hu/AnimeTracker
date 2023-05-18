@@ -1,6 +1,10 @@
 package me.kht.animetracker
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +14,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.model.AnimeItem
+import me.kht.animetracker.model.AnimeSearchedItem
 import me.kht.animetracker.ui.component.EpisodeState
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -52,6 +58,12 @@ class MainViewModel : ViewModel() {
         )
         time
     }
+
+    val searching = mutableStateOf(false)
+    val searchResult = mutableStateListOf<AnimeSearchedItem>()
+
+    val databaseExporting = mutableStateOf(false)
+    val databaseImporting = mutableStateOf(false)
 
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
@@ -202,6 +214,62 @@ class MainViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun searchByKeyword(
+        keyword: String,
+        state: LazyListState,
+        scope: CoroutineScope,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch {
+        Log.i("MainViewModel", "Searching for $keyword")
+        searching.value = true
+        try {
+            val result = repository.searchAnimeItemByKeyword(keyword)
+            searchResult.clear()
+            searchResult.addAll(result)
+        } catch (e: WebApiClient.WebRequestException) {
+            toastShort(context, context.getString(R.string.failed_to_search_for_anime))
+        } finally {
+            searching.value = false
+        }
+        scope.launch {
+            state.animateScrollToItem(0)
+        }
+    }
+
+    suspend fun watchListContains(animeId: Int):Boolean{
+        return repository.watchListContains(watchListTitle,animeId)
+    }
+
+    fun exportDatabase(context: Context,uri:Uri){
+        databaseExporting.value = true
+        repository.exportDatabase(context,uri){ result ->
+            databaseExporting.value = false
+            if (result){
+                toastShort(context,context.getString(R.string.exported_database_successfully))
+            }else{
+                toastShort(context,context.getString(R.string.failed_to_export_database))
+            }
+        }
+    }
+
+    fun importDatabase(context: Context,uri: Uri){
+        databaseImporting.value = true
+        repository.importDatabase(context,uri){ result ->
+            databaseImporting.value = false
+            if (result){
+                toastShort(context,context.getString(R.string.imported_database_successfully))
+            }else{
+                toastShort(context,context.getString(R.string.failed_to_import_database))
+            }
+        }
+    }
+
+    private fun toastShort(context: Context,msg:String){
+        CoroutineScope(Dispatchers.Main).launch{
+            Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
         }
     }
 }

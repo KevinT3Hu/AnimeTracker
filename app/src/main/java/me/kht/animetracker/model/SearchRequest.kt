@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class SearchRequest(
     val keyword: String,
     val filter: Filter = Filter(),
-    val sort:String = "heat"
+    val sort:String = "match"
 ) {
     @Serializable
     data class Filter(

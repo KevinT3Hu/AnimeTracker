@@ -16,8 +16,8 @@ android {
         applicationId = "me.kht.animetracker"
         minSdk = 29
         targetSdk = 33
-        versionCode = 11
-        versionName = "v1.3.3"
+        versionCode = 12
+        versionName = "v1.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmmss'Z'")
@@ -59,7 +59,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-beta01")
+    implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
     implementation("com.google.accompanist:accompanist-flowlayout:0.31.1-alpha")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0-RC")
     implementation(platform("androidx.compose:compose-bom:2022.10.00"))

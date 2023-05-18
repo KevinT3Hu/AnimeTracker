@@ -8,5 +8,6 @@ data class AnimeSearchedItem(
     val id: Int,
     val image: String,
     val name: String,
+    val date: String,
     @SerialName("name_cn") val nameCN: String
 )
