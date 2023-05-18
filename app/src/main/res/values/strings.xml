@@ -26,4 +26,7 @@
     <string name="imported_database_successfully">Imported database successfully</string>
     <string name="failed_to_import_database">Failed to import database</string>
     <string name="failed_to_export_database">Failed to export database</string>
+    <string name="searching">Searching&#8230;</string>
+    <string name="add_to_list">Add To List</string>
+    <string name="added">Added to <i>%s</i></string>
 </resources>

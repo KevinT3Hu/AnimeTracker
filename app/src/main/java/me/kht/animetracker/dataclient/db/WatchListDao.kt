@@ -26,6 +26,10 @@ interface WatchListCrossRefDao {
     suspend fun addAnimeStateToWatchList(animeId: Int, title: String)
 
     @Transaction
+    @Query("SELECT * FROM WatchListAnimeStateCrossRef WHERE title = :title AND animeId = :animeId")
+    suspend fun getAnimeStateFromWatchList(animeId: Int, title: String): WatchListAnimeStateCrossRef?
+
+    @Transaction
     @Query("DELETE FROM WatchListAnimeStateCrossRef WHERE title = :title AND animeId = :animeId")
     suspend fun removeAnimeStateFromWatchList(animeId: Int, title: String)
 

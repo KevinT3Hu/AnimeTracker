@@ -53,6 +53,9 @@ class AnimeDataRepository(db: WatchListDatabase) {
     fun importDatabase(context: Context,uri: Uri, onDone: (Boolean) -> Unit) =
         localDataClient.importDatabase(context,uri, onDone)
 
+    suspend fun watchListContains(watchListTitle:String, animeId: Int) =
+        localDataClient.watchListContains(watchListTitle, animeId)
+
     companion object {
         private var instance: AnimeDataRepository? = null
 

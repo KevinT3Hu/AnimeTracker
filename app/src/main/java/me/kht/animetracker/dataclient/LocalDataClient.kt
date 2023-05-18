@@ -157,6 +157,10 @@ class LocalDataClient(db: WatchListDatabase) {
         onDone.invoke(true)
     }
 
+    suspend fun watchListContains(watchListTitle: String, animeId: Int): Boolean {
+        return watchListCrossRefDao.getAnimeStateFromWatchList(animeId, watchListTitle)!=null
+    }
+
     @Serializable
     private data class DatabaseJson(
         val watchListString: String,

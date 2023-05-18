@@ -27,4 +27,7 @@
     <string name="imported_database_successfully">导入成功</string>
     <string name="failed_to_import_database">导入失败</string>
     <string name="failed_to_export_database">导出失败</string>
+    <string name="searching">搜索中&#8230;</string>
+    <string name="add_to_list">添加</string>
+    <string name="added">已添加至<i>%s</i></string>
 </resources>

@@ -59,6 +59,7 @@ class MainViewModel : ViewModel() {
         time
     }
 
+    val searching = mutableStateOf(false)
     val searchResult = mutableStateListOf<AnimeSearchedItem>()
 
     val databaseExporting = mutableStateOf(false)
@@ -222,16 +223,24 @@ class MainViewModel : ViewModel() {
         scope: CoroutineScope,
         context: Context
     ) = CoroutineScope(Dispatchers.IO).launch {
+        Log.i("MainViewModel", "Searching for $keyword")
+        searching.value = true
         try {
             val result = repository.searchAnimeItemByKeyword(keyword)
             searchResult.clear()
             searchResult.addAll(result)
         } catch (e: WebApiClient.WebRequestException) {
             toastShort(context, context.getString(R.string.failed_to_search_for_anime))
+        } finally {
+            searching.value = false
         }
         scope.launch {
             state.animateScrollToItem(0)
         }
+    }
+
+    suspend fun watchListContains(animeId: Int):Boolean{
+        return repository.watchListContains(watchListTitle,animeId)
     }
 
     fun exportDatabase(context: Context,uri:Uri){
