@@ -93,7 +93,7 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                 .verticalScroll(scrollState)) {
 
                 // version info
-                Card(modifier = cardModifier) {
+                Card(modifier = cardModifier.clickable {  }) {
                     Column(modifier = cardModifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
                         val modifier = Modifier.padding(vertical = 5.dp)

@@ -32,4 +32,5 @@
     <string name="refresh_database" >Refresh Database</string>
     <string name="database_refreshing">Refreshing&#8230; (%1$d/%2$d)</string>
     <string name="refreshed_database_successfully">Refresh finished.</string>
+    <string name="archived_watch_lists">Archived Watch Lists</string>
 </resources>

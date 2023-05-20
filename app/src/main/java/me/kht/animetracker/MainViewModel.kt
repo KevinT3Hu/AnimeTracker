@@ -135,6 +135,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun archiveWatchList() {
+        repository.archiveWatchList(watchListTitle)
+    }
+
+    fun unarchiveWatchList(title: String) {
+        repository.archiveWatchList(title,false)
+    }
+
     fun updateAnimeLists() {
         CoroutineScope(Dispatchers.IO).launch {
             allAnimeAssociatedWithWatchList.collectLatest { animeSet ->

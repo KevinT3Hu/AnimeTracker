@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
@@ -39,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -52,6 +55,7 @@ import me.kht.animetracker.MainViewModel
 import me.kht.animetracker.NavigationRoute
 import me.kht.animetracker.R
 import me.kht.animetracker.ui.component.AirScheduleRoute
+import me.kht.animetracker.ui.component.ArchivedRoute
 import me.kht.animetracker.ui.component.HomeRoute
 import me.kht.animetracker.ui.component.WatchListRoute
 import me.kht.animetracker.ui.theme.Dimension
@@ -90,7 +94,9 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
             drawerContent = {
                 ModalDrawerSheet {
 
-                    val itemModifier = Modifier.fillMaxWidth().padding(Dimension.navigationDrawerItemHorizontalPadding)
+                    val itemModifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Dimension.navigationDrawerItemHorizontalPadding)
 
                     Box(
                         modifier = Modifier
@@ -123,6 +129,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     Spacer(modifier = Modifier.height(20.dp))
 
                     NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Home, contentDescription = "") },
                         label = { Text(text = stringResource(R.string.home)) },
                         modifier = itemModifier,
                         selected = currentRoute.value?.destination?.route == NavigationRoute.HOME_ROUTE,
@@ -134,6 +141,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                         })
 
                     NavigationDrawerItem(
+                        icon = { Icon(painter = painterResource(id = R.drawable.schedule), contentDescription = "") },
                         label = { Text(text = stringResource(id = R.string.air_schedule)) },
                         selected = currentRoute.value?.destination?.route == NavigationRoute.SCHEDULE_ROUTE,
                         modifier = itemModifier,
@@ -152,6 +160,9 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     )
 
                     allWatchList.value.forEach {
+                        if (it.watchList.archived){
+                            return@forEach
+                        }
                         NavigationDrawerItem(
                             modifier = itemModifier,
                             label = { Text(text = it.watchList.title) },
@@ -165,6 +176,20 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                             })
                     }
 
+                    // Archived
+                    NavigationDrawerItem(
+                        icon = { Icon(painter = painterResource(id = R.drawable.archive), contentDescription = "") },
+                        label = { Text(text = "Archived Watch Lists") },
+                        selected = currentRoute.value?.destination?.route == NavigationRoute.ARCHIVED_WATCHLIST,
+                        onClick = {
+                            routeNavController.navigateTo(NavigationRoute.ARCHIVED_WATCHLIST)
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        },
+                        modifier = itemModifier
+                    )
+
                     Divider(
                         modifier = Modifier.padding(
                             horizontal = 16.dp,
@@ -173,15 +198,21 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     )
 
                     NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Add, contentDescription = "") },
                         label = { Text(stringResource(R.string.create_new_watch_list)) },
                         selected = false,
                         onClick = { showNewWatchListDialog = true },
                         modifier = itemModifier
                     )
                     NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Info, contentDescription = "") },
                         label = { Text(stringResource(id = R.string.about_title)) },
                         selected = false,
-                        onClick = { rootNavController.navigate(NavigationRoute.ABOUT_ROUTE) },
+                        onClick = {
+                            rootNavController.navigate(NavigationRoute.ABOUT_ROUTE)
+                            scope.launch {
+                                drawerState.close()
+                            } },
                         modifier = itemModifier
                     )
                 }
@@ -201,14 +232,16 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                         title = {
                             Text(
                                 text = when (currentRoute.value?.destination?.route) {
-                                    "home" -> stringResource(R.string.app_name)
-                                    "schedule" -> stringResource(R.string.air_schedule)
+                                    NavigationRoute.HOME_ROUTE -> stringResource(R.string.app_name)
+                                    NavigationRoute.SCHEDULE_ROUTE -> stringResource(R.string.air_schedule)
+                                    NavigationRoute.ARCHIVED_WATCHLIST -> stringResource(R.string.archived_watch_lists)
                                     else -> viewModel.watchListTitle
                                 }
                             )
                         },
                         actions = {
                             if (currentRoute.value?.destination?.route == NavigationRoute.WATCHLIST_ROUTE) {
+                                // delete
                                 IconButton(onClick = {
                                     showDeleteWatchListDialog = true
                                 }) {
@@ -216,6 +249,26 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = null
                                     )
+                                }
+
+                                val watchList = allWatchList.value.find { it.watchList.title == viewModel.watchListTitle }!!
+                                // archive
+                                if (watchList.watchList.archived){
+                                    IconButton(onClick = {
+                                        viewModel.unarchiveWatchList(watchList.watchList.title)
+                                    }) {
+                                        Icon(painter = painterResource(id = R.drawable.unarchive), contentDescription = "")
+                                    }
+                                }else{
+                                    IconButton(onClick = {
+                                        viewModel.archiveWatchList()
+                                        routeNavController.navigateTo(NavigationRoute.HOME_ROUTE)
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.archive),
+                                            contentDescription = null
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -247,6 +300,9 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     }
                     composable(NavigationRoute.WATCHLIST_ROUTE) {
                         WatchListRoute(viewModel = viewModel)
+                    }
+                    composable(NavigationRoute.ARCHIVED_WATCHLIST){
+                        ArchivedRoute(viewModel = viewModel, navController = routeNavController)
                     }
                 }
             }

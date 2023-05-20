@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.kht.animetracker.dataclient.LocalDataClient
 import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.dataclient.db.WatchListDatabase
+import me.kht.animetracker.dataclient.db.migration1_2
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.Episode
 
@@ -47,6 +48,8 @@ class AnimeDataRepository(db: WatchListDatabase) {
     suspend fun getLocalAnimeStateById(id: Int) = localDataClient.getAnimeStateById(id)
 
     fun deleteWatchList(title: String) = localDataClient.deleteWatchList(title)
+
+    fun archiveWatchList(title: String,archived:Boolean=true) = localDataClient.archiveWatchList(title,archived)
 
     suspend fun searchAnimeItemByKeyword(keyword: String) =
         webApiClient.searchAnimeItemByKeyword(keyword)
@@ -103,7 +106,7 @@ class AnimeDataRepository(db: WatchListDatabase) {
                 context,
                 WatchListDatabase::class.java,
                 "watchlist"
-            ).build()
+            ).addMigrations(migration1_2).build()
             instance = AnimeDataRepository(database)
         }
 
