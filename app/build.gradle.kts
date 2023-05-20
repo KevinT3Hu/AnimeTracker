@@ -1,11 +1,13 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -14,15 +16,17 @@ android {
 
     defaultConfig {
         applicationId = "me.kht.animetracker"
-        minSdk = 29
+        minSdk = 28
         targetSdk = 33
-        versionCode = 12
-        versionName = "v1.4.0"
+        versionCode = 13
+        versionName = "v1.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmmss'Z'")
-        val time = LocalDateTime.now().format(dateTimeFormatter)
+        val time = LocalDateTime.now(ZoneId.of("Etc/GMT+8")).format(dateTimeFormatter)
         setProperty("archivesBaseName", "$applicationId-$versionName-$time")
+        buildConfigField("String", "BUILD_TIME", "\"$time\"")
+        buildConfigField("String", "PROJECT_URL", "\"https://github.com/KevinT3Hu/AnimeTracker\"")
     }
 
     buildTypes {
@@ -84,6 +88,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("io.coil-kt:coil:2.3.0")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

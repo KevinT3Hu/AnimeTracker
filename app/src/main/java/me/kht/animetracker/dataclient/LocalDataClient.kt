@@ -12,10 +12,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import me.kht.animetracker.JsonSerializer
-import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.dataclient.db.WatchListDatabase
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeState
+import me.kht.animetracker.model.Episode
 import me.kht.animetracker.model.WatchListAnimeStateCrossRef
 import me.kht.animetracker.model.WatchListEntity
 import java.io.BufferedReader
@@ -55,10 +55,13 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
-    fun getAllAnimeAssociatedWithWatchList(): Flow<Set<AnimeState>> =
+    fun getAllAnimeAssociatedWithWatchList(getArchived:Boolean=false): Flow<Set<AnimeState>> =
         watchListCrossRefDao.getAllWatchLists().map {
             val animeStates = mutableSetOf<AnimeState>()
             for (watchList in it) {
+                if ((!getArchived) && watchList.watchList.archived){
+                    continue
+                }
                 watchList.items.forEach { animeState ->
                     animeStates.add(animeState)
                 }
@@ -94,15 +97,35 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
-    fun exportDatabase(context:Context,uri: Uri, onDone: (Boolean) -> Unit) = CoroutineScope(Dispatchers.IO).launch {
-        val exportedWatchListString = JsonSerializer.encodeToString(watchListDao.getAllWatchListsStatic())
-        val exportedAnimeStateString = JsonSerializer.encodeToString(animeStateDao.getAllAnimeStatesStatic())
-        val exportedWatchListCrossRefString = JsonSerializer.encodeToString(watchListCrossRefDao.getAllWatchListCrossRefStatic())
-        val exportedEpisodeString = JsonSerializer.encodeToString(episodeDao.getAllEpisodesStatic())
+    fun archiveWatchList(title: String,archived:Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            watchListDao.archiveWatchList(title,archived)
+        }
+    }
 
-        val databaseJson = DatabaseJson(
-            exportedWatchListString,
-            exportedAnimeStateString,
+    suspend fun getAllAnimeStatesStatic() = animeStateDao.getAllAnimeStatesStatic()
+
+    suspend fun updateAnimeStates(animeStates: List<AnimeState>) =
+        animeStateDao.updateAnimeStates(animeStates)
+
+    suspend fun getAllEpisodesStatic() = episodeDao.getAllEpisodesStatic()
+
+    suspend fun updateEpisodes(episodes: List<Episode>) = episodeDao.updateEpisodes(episodes)
+
+    fun exportDatabase(context: Context, uri: Uri, onDone: (Boolean) -> Unit) =
+        CoroutineScope(Dispatchers.IO).launch {
+            val exportedWatchListString =
+                JsonSerializer.encodeToString(watchListDao.getAllWatchListsStatic())
+            val exportedAnimeStateString =
+                JsonSerializer.encodeToString(animeStateDao.getAllAnimeStatesStatic())
+            val exportedWatchListCrossRefString =
+                JsonSerializer.encodeToString(watchListCrossRefDao.getAllWatchListCrossRefStatic())
+            val exportedEpisodeString =
+                JsonSerializer.encodeToString(episodeDao.getAllEpisodesStatic())
+
+            val databaseJson = DatabaseJson(
+                exportedWatchListString,
+                exportedAnimeStateString,
             exportedWatchListCrossRefString,
             exportedEpisodeString
         )

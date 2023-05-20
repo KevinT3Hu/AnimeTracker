@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "WatchList")
 data class WatchListEntity(
     @PrimaryKey @ColumnInfo(index = true) val title: String,
+    val archived: Boolean = false
 )
 
 @Serializable

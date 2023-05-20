@@ -8,4 +8,5 @@ object NavigationRoute {
     const val HOME_ROUTE = "home"
     const val SCHEDULE_ROUTE = "schedule"
     const val WATCHLIST_ROUTE = "watchlist"
+    const val ARCHIVED_WATCHLIST = "archived"
 }

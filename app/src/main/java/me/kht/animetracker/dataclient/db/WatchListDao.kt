@@ -55,6 +55,9 @@ interface WatchListDao {
     @Query("DELETE FROM WatchList WHERE title = :title")
     suspend fun deleteWatchList(title: String)
 
+    @Query("UPDATE WatchList SET archived = :archived WHERE title = :title")
+    suspend fun archiveWatchList(title: String,archived: Boolean)
+
     @Query("SELECT * FROM WatchList")
     suspend fun getAllWatchListsStatic(): List<WatchListEntity>
 

@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import me.kht.animetracker.model.Episode
 
 @Dao
 interface EpisodeDao {
@@ -19,4 +21,7 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM Episode")
     suspend fun getAllEpisodesStatic(): List<Episode>
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun updateEpisodes(episode: List<Episode>)
 }
