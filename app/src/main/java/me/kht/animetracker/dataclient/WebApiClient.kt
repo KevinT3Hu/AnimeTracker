@@ -7,9 +7,9 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
 import me.kht.animetracker.JsonSerializer
-import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeSearchedItem
+import me.kht.animetracker.model.Episode
 import me.kht.animetracker.model.SearchRequest
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -69,6 +69,19 @@ class WebApiClient {
             return@withContext JsonSerializer.decodeFromString<List<Episode>>(data.toString())
         }
         throw WebRequestException(response.code, response, "id=$id")
+    }
+
+    suspend fun getEpisodeByEpisodeId(episodeId: Int) = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("$BASE_URL/v0/episodes/$episodeId")
+            .get()
+            .build()
+        val response = httpClient.newCall(request).execute()
+        if (response.isSuccessful) {
+            val json = response.body.string()
+            return@withContext JsonSerializer.decodeFromString<Episode>(json)
+        }
+        throw WebRequestException(response.code, response, "episodeId=$episodeId")
     }
 
     class WebRequestException(val code: Int, val response: Response, extra: Any? = null) :

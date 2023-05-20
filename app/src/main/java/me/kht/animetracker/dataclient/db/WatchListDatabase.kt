@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import me.kht.animetracker.model.AnimeState
+import me.kht.animetracker.model.Episode
 import me.kht.animetracker.model.WatchListAnimeStateCrossRef
 import me.kht.animetracker.model.WatchListEntity
 

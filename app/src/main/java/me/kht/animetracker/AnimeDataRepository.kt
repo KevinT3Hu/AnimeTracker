@@ -2,12 +2,16 @@ package me.kht.animetracker
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.room.Room
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.kht.animetracker.dataclient.LocalDataClient
 import me.kht.animetracker.dataclient.WebApiClient
-import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.dataclient.db.WatchListDatabase
 import me.kht.animetracker.model.AnimeItem
+import me.kht.animetracker.model.Episode
 
 class AnimeDataRepository(db: WatchListDatabase) {
 
@@ -50,11 +54,46 @@ class AnimeDataRepository(db: WatchListDatabase) {
     fun exportDatabase(context: Context, uri: Uri, onDone: (Boolean) -> Unit) =
         localDataClient.exportDatabase(context, uri, onDone)
 
-    fun importDatabase(context: Context,uri: Uri, onDone: (Boolean) -> Unit) =
-        localDataClient.importDatabase(context,uri, onDone)
+    fun importDatabase(context: Context, uri: Uri, onDone: (Boolean) -> Unit) =
+        localDataClient.importDatabase(context, uri, onDone)
 
-    suspend fun watchListContains(watchListTitle:String, animeId: Int) =
+    suspend fun watchListContains(watchListTitle: String, animeId: Int) =
         localDataClient.watchListContains(watchListTitle, animeId)
+
+    suspend fun refreshDatabase(workerThreadCount:Int=10,progress:(Int,Int)->Unit={_,_->}) {
+        // update anime states
+        val animeStates = localDataClient.getAllAnimeStatesStatic()
+        val episodes = localDataClient.getAllEpisodesStatic()
+
+        val total = animeStates.size + episodes.size
+        Log.i("AnimeDataRepository", "total: $total")
+        Log.i("AnimeDataRepository", "animeStates: ${animeStates.size}")
+        Log.i("AnimeDataRepository", "episodes: ${episodes.size}")
+        var progressCount = 0
+
+        if (animeStates.isNotEmpty()){
+            val updatedAnimeStates = animeStates.map { state ->
+                progress(++progressCount, total)
+                state.copy(animeItem = webApiClient.getAnimeItemById(state.animeId))
+            }
+            localDataClient.updateAnimeStates(updatedAnimeStates)
+        }
+
+        if (episodes.isNotEmpty()){
+            // divide episodes into chunks
+            val episodeChunkSize = episodes.size/ workerThreadCount
+            val episodeChunks = episodes.chunked(episodeChunkSize)
+            episodeChunks.forEach { chunk ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    val updatedEpisodes = chunk.map { episode ->
+                        progress(++progressCount, total)
+                        webApiClient.getEpisodeByEpisodeId(episode.id)
+                    }
+                    localDataClient.updateEpisodes(updatedEpisodes)
+                }
+            }
+        }
+    }
 
     companion object {
         private var instance: AnimeDataRepository? = null

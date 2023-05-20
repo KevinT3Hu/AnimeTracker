@@ -1,4 +1,4 @@
-package me.kht.animetracker.dataclient.db
+package me.kht.animetracker.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

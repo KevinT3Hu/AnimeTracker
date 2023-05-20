@@ -20,7 +20,6 @@ interface AnimeStateDao {
     @Update(entity = AnimeState::class)
     suspend fun updateAnimeState(animeState: AnimeState)
 
-
     @Query("SELECT * FROM AnimeState WHERE animeId = :id")
     fun getAnimeStateById(id: Int): Flow<AnimeState?>
 
@@ -29,4 +28,7 @@ interface AnimeStateDao {
 
     @Query("SELECT * FROM AnimeState")
     suspend fun getAllAnimeStatesStatic(): List<AnimeState>
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun updateAnimeStates(animeStates: List<AnimeState>)
 }

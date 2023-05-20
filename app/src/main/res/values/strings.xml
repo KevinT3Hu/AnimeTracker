@@ -29,4 +29,7 @@
     <string name="searching">Searching&#8230;</string>
     <string name="add_to_list">Add To List</string>
     <string name="added">Added to <i>%s</i></string>
+    <string name="refresh_database" >Refresh Database</string>
+    <string name="database_refreshing">Refreshing&#8230; (%1$d/%2$d)</string>
+    <string name="refreshed_database_successfully">Refresh finished.</string>
 </resources>

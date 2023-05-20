@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.kht.animetracker.dataclient.WebApiClient
-import me.kht.animetracker.dataclient.db.Episode
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeSearchedItem
+import me.kht.animetracker.model.Episode
 import me.kht.animetracker.ui.component.EpisodeState
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -64,6 +64,9 @@ class MainViewModel : ViewModel() {
 
     val databaseExporting = mutableStateOf(false)
     val databaseImporting = mutableStateOf(false)
+    val databaseRefreshing = mutableStateOf(false)
+    val refreshingProgress = mutableStateOf(0)
+    val refreshingTotal = mutableStateOf(0)
 
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
@@ -257,19 +260,39 @@ class MainViewModel : ViewModel() {
 
     fun importDatabase(context: Context,uri: Uri){
         databaseImporting.value = true
-        repository.importDatabase(context,uri){ result ->
+        repository.importDatabase(context, uri) { result ->
             databaseImporting.value = false
-            if (result){
-                toastShort(context,context.getString(R.string.imported_database_successfully))
-            }else{
-                toastShort(context,context.getString(R.string.failed_to_import_database))
+            if (result) {
+                toastShort(context, context.getString(R.string.imported_database_successfully))
+            } else {
+                toastShort(context, context.getString(R.string.failed_to_import_database))
             }
         }
     }
 
-    private fun toastShort(context: Context,msg:String){
-        CoroutineScope(Dispatchers.Main).launch{
-            Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
+    fun refreshDatabase(context: Context) {
+        databaseRefreshing.value = true
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                repository.refreshDatabase(){ progress, total->
+                    refreshingProgress.value = progress
+                    refreshingTotal.value = total
+                    if (progress == total){
+                        databaseRefreshing.value = false
+                        toastShort(context,context.getString(R.string.refreshed_database_successfully))
+                    }
+                }
+            } catch (e: WebApiClient.WebRequestException) {
+                databaseRefreshing.value = false
+                toastShort(context, e.message!!)
+                return@launch
+            }
+        }
+    }
+
+    private fun toastShort(context: Context, msg: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 }
