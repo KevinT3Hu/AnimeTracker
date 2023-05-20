@@ -46,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import me.kht.animetracker.BuildConfig
 import me.kht.animetracker.MainViewModel
 import me.kht.animetracker.R
@@ -146,6 +147,21 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                         }
                         Text(
                             text = if (viewModel.databaseRefreshing.value) stringResource(id = R.string.database_refreshing,viewModel.refreshingProgress.value,viewModel.refreshingTotal.value) else stringResource(id = R.string.refresh_database),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+
+                // Third party licenses
+                Card(modifier = cardModifier, onClick = {
+                    context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                }) {
+                    Column(
+                        modifier = cardContentModifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.third_party_licenses),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
