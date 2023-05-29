@@ -19,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,7 +32,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AirScheduleRoute(viewModel: MainViewModel) {
 
-    val allAnime = viewModel.allAnimeAssociatedWithWatchList.collectAsState(emptyList())
+    val allAnime = viewModel.allVisibleAnimeAssociatedWithWatchList.collectAsState(emptyList())
 
     LaunchedEffect(key1 = allAnime.value) {
         Log.i("AirScheduleRoute", "allAnime.value: ${allAnime.value}")

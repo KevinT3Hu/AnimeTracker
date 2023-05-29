@@ -12,7 +12,8 @@ data class AnimeState(
     @PrimaryKey @ColumnInfo(index = true) val animeId: Int,
     @Embedded val animeItem: AnimeItem,
     val favorite: Boolean = false,
-    val watchedEpisodes: MutableSet<Int> = mutableSetOf()
+    val watchedEpisodes: MutableSet<Int> = mutableSetOf(),
+    val visibility: Boolean = true,
 ) {
     fun markEpisodeWatchedState(episodeIndex: Int, watched: Boolean) {
         if (watched) {

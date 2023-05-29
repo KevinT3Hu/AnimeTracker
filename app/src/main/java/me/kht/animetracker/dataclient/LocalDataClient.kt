@@ -55,7 +55,7 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
-    fun getAllAnimeAssociatedWithWatchList(getArchived:Boolean=false): Flow<Set<AnimeState>> =
+    fun getAllVisibleAnimeAssociatedWithWatchList(getArchived:Boolean=false): Flow<Set<AnimeState>> =
         watchListCrossRefDao.getAllWatchLists().map {
             val animeStates = mutableSetOf<AnimeState>()
             for (watchList in it) {
@@ -63,7 +63,9 @@ class LocalDataClient(db: WatchListDatabase) {
                     continue
                 }
                 watchList.items.forEach { animeState ->
-                    animeStates.add(animeState)
+                    if (animeState.visibility){
+                        animeStates.add(animeState)
+                    }
                 }
             }
             animeStates
@@ -90,6 +92,12 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
+    fun updateAnimeStateVisibility(animeId: Int, visibility: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            animeStateDao.updateAnimeStateVisibility(animeId, visibility)
+        }
+    }
+
     fun deleteWatchList(title: String) {
         CoroutineScope(Dispatchers.IO).launch {
             watchListCrossRefDao.deleteWatchList(title)
@@ -97,7 +105,7 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
-    fun archiveWatchList(title: String,archived:Boolean) {
+    fun archiveWatchList(title: String, archived: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             watchListDao.archiveWatchList(title,archived)
         }

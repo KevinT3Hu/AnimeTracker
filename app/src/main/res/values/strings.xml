@@ -34,4 +34,6 @@
     <string name="refreshed_database_successfully">Refresh finished.</string>
     <string name="archived_watch_lists">Archived Watch Lists</string>
     <string name="third_party_licenses">Third Party Licenses</string>
+    <string name="show_invisible_items">Invisible Items</string>
+    <string name="items_selected">%1$d Selected</string>
 </resources>

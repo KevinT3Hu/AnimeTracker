@@ -31,4 +31,7 @@ interface AnimeStateDao {
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateAnimeStates(animeStates: List<AnimeState>)
+
+    @Query("UPDATE AnimeState SET visibility = :visibility WHERE animeId = :id")
+    suspend fun updateAnimeStateVisibility(id: Int, visibility: Boolean)
 }

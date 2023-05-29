@@ -1,6 +1,7 @@
 package me.kht.animetracker.ui.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,14 +25,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import me.kht.animetracker.MainViewModel
-import me.kht.animetracker.R
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeState
 
@@ -44,27 +41,32 @@ fun AnimeStateItem(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
     onClick: (AnimeItem) -> Unit = {},
-    horizontalPadding:Dp = 0.dp
+    horizontalPadding:Dp = 0.dp,
+    selected:Boolean = false
 ) {
 
     val scope = rememberCoroutineScope()
 
     val episodes = List(animeState.animeItem.eps) { it + 1 }
 
-    var contextMenu by remember { mutableStateOf(false) }
-
     val canvasSize = 40.dp
     val canvasHorizontalPadding = 5.dp
     val padding = PaddingValues(horizontal = canvasHorizontalPadding, vertical = 5.dp)
 
-    Box(modifier = modifier.wrapContentSize(align = Alignment.TopStart)) {
+    val backgroundColor = if (selected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surface
+
+    Box(modifier = modifier.wrapContentSize(align = Alignment.TopStart).background(backgroundColor)) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    onClick.invoke(animeState.animeItem)
+                    if (viewModel.actionMode){
+                        viewModel.toggleItem(animeState)
+                    }else{
+                        onClick.invoke(animeState.animeItem)
+                    }
                 },
-                onLongClick = { contextMenu = true }
+                onLongClick = { viewModel.selectItem(animeState) }
             )
             .padding(horizontal = horizontalPadding), horizontalAlignment = Alignment.Start
         ) {
@@ -89,7 +91,7 @@ fun AnimeStateItem(
                     )
                     FlowRow {
                         episodes.forEach { ep->
-                            var selected by remember {
+                            var epSelected by remember {
                                 mutableStateOf(
                                     animeState.watchedEpisodes.contains(
                                         ep
@@ -104,7 +106,7 @@ fun AnimeStateItem(
                             EpisodeMarker(
                                 ep,
                                 airState,
-                                selected,
+                                epSelected,
                                 canvasSize = canvasSize,
                                 paddingValues = padding
                             ) {
@@ -113,7 +115,7 @@ fun AnimeStateItem(
                                     ep,
                                     it
                                 )
-                                selected = it
+                                epSelected = it
                             }
                         }
                     }
@@ -125,14 +127,6 @@ fun AnimeStateItem(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                 thickness = 1.dp
             )
-        }
-        DropdownMenu(expanded = contextMenu, onDismissRequest = { contextMenu = false }) {
-            DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.remove)) },
-                onClick = {
-                    contextMenu = false
-                    viewModel.removeItemFromWatchList(animeState.animeId)
-                })
         }
     }
 }

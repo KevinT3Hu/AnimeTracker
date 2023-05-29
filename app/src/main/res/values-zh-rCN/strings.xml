@@ -35,4 +35,6 @@
     <string name="refreshed_database_successfully">刷新完成</string>
     <string name="archived_watch_lists">已归档的观看列表</string>
     <string name="third_party_licenses">开源许可证</string>
+    <string name="show_invisible_items">查看隐藏项</string>
+    <string name="items_selected">已选择%1$d项</string>
 </resources>

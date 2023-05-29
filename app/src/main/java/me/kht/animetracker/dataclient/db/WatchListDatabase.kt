@@ -12,7 +12,7 @@ import me.kht.animetracker.model.WatchListEntity
 
 @Database(
     entities = [WatchListEntity::class, WatchListAnimeStateCrossRef::class, AnimeState::class, Episode::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converter::class)
@@ -28,5 +28,11 @@ val migration1_2 = object :Migration(1,2){
         // add new column "archived" to WatchList table, default value is false
         database.execSQL("ALTER TABLE WatchList ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
     }
+}
 
+val migration2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // add new column "visibility" to AnimeState table, default value is true
+        database.execSQL("ALTER TABLE AnimeState ADD COLUMN visibility INTEGER NOT NULL DEFAULT 1")
+    }
 }

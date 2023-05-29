@@ -11,6 +11,7 @@ import me.kht.animetracker.dataclient.LocalDataClient
 import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.dataclient.db.WatchListDatabase
 import me.kht.animetracker.dataclient.db.migration1_2
+import me.kht.animetracker.dataclient.db.migration2_3
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.Episode
 
@@ -38,7 +39,7 @@ class AnimeDataRepository(db: WatchListDatabase) {
 
     fun addEpisodes(episodes: List<Episode>) = localDataClient.addEpisodes(episodes)
 
-    fun getAllAnimeAssociatedWithWatchList() = localDataClient.getAllAnimeAssociatedWithWatchList()
+    fun getAllVisibleAnimeAssociatedWithWatchList() = localDataClient.getAllVisibleAnimeAssociatedWithWatchList()
 
     fun markEpisodeWatchedState(animeId: Int, episodeIndex: Int, watched: Boolean) =
         localDataClient.markEpisodeWatchedState(animeId, episodeIndex, watched)
@@ -63,18 +64,19 @@ class AnimeDataRepository(db: WatchListDatabase) {
     suspend fun watchListContains(watchListTitle: String, animeId: Int) =
         localDataClient.watchListContains(watchListTitle, animeId)
 
-    suspend fun refreshDatabase(workerThreadCount:Int=10,progress:(Int,Int)->Unit={_,_->}) {
-        // update anime states
-        val animeStates = localDataClient.getAllAnimeStatesStatic()
-        val episodes = localDataClient.getAllEpisodesStatic()
+    fun refreshDatabase(workerThreadCount: Int = 10, progress: (Int, Int) -> Unit = { _, _ -> }) =
+        CoroutineScope(Dispatchers.IO).launch {
+            // update anime states
+            val animeStates = localDataClient.getAllAnimeStatesStatic()
+            val episodes = localDataClient.getAllEpisodesStatic()
 
-        val total = animeStates.size + episodes.size
-        Log.i("AnimeDataRepository", "total: $total")
-        Log.i("AnimeDataRepository", "animeStates: ${animeStates.size}")
-        Log.i("AnimeDataRepository", "episodes: ${episodes.size}")
-        var progressCount = 0
+            val total = animeStates.size + episodes.size
+            Log.i("AnimeDataRepository", "total: $total")
+            Log.i("AnimeDataRepository", "animeStates: ${animeStates.size}")
+            Log.i("AnimeDataRepository", "episodes: ${episodes.size}")
+            var progressCount = 0
 
-        if (animeStates.isNotEmpty()){
+            if (animeStates.isNotEmpty()){
             val updatedAnimeStates = animeStates.map { state ->
                 progress(++progressCount, total)
                 state.copy(animeItem = webApiClient.getAnimeItemById(state.animeId))
@@ -87,16 +89,17 @@ class AnimeDataRepository(db: WatchListDatabase) {
             val episodeChunkSize = episodes.size/ workerThreadCount
             val episodeChunks = episodes.chunked(episodeChunkSize)
             episodeChunks.forEach { chunk ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    val updatedEpisodes = chunk.map { episode ->
-                        progress(++progressCount, total)
-                        webApiClient.getEpisodeByEpisodeId(episode.id)
-                    }
-                    localDataClient.updateEpisodes(updatedEpisodes)
+                val updatedEpisodes = chunk.map { episode ->
+                    progress(++progressCount, total)
+                    webApiClient.getEpisodeByEpisodeId(episode.id)
                 }
+                localDataClient.updateEpisodes(updatedEpisodes)
             }
         }
-    }
+        }
+
+    fun updateAnimeStateVisibility(animeId: Int, visibility: Boolean) =
+        localDataClient.updateAnimeStateVisibility(animeId, visibility)
 
     companion object {
         private var instance: AnimeDataRepository? = null
@@ -106,7 +109,7 @@ class AnimeDataRepository(db: WatchListDatabase) {
                 context,
                 WatchListDatabase::class.java,
                 "watchlist"
-            ).addMigrations(migration1_2).build()
+            ).addMigrations(migration1_2, migration2_3).build()
             instance = AnimeDataRepository(database)
         }
 

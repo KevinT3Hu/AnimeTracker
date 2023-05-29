@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeSearchedItem
+import me.kht.animetracker.model.AnimeState
 import me.kht.animetracker.model.Episode
 import me.kht.animetracker.ui.component.EpisodeState
 import java.time.ZoneId
@@ -30,7 +31,7 @@ class MainViewModel : ViewModel() {
     private val episodeStateCache = mutableMapOf<String, EpisodeState>()
 
     val allWatchList = repository.getAllWatchList()
-    val allAnimeAssociatedWithWatchList = repository.getAllAnimeAssociatedWithWatchList()
+    val allVisibleAnimeAssociatedWithWatchList = repository.getAllVisibleAnimeAssociatedWithWatchList()
     private val _watchListTitle = mutableStateOf("")
     var watchListTitle: String
         get() = _watchListTitle.value
@@ -110,6 +111,14 @@ class MainViewModel : ViewModel() {
             _showDeleteWatchListDialog.value = value
         }
 
+    private val _actionMode = mutableStateOf(false)
+    var actionMode: Boolean
+        get() = _actionMode.value
+        private set(value) {
+            _actionMode.value = value
+        }
+    val selectedAnimeStates = mutableStateListOf<AnimeState>()
+
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
         if (episodeStateCache.containsKey(cacheKey)) {
@@ -152,9 +161,23 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun removeItemFromWatchList(animeId: Int, title: String = watchListTitle) {
+    fun removeSelectedItemsFromWatchList(title: String = watchListTitle) {
+        selectedAnimeStates.clear()
         CoroutineScope(Dispatchers.IO).launch {
-            repository.removeItemFromWatchList(title, animeId)
+            selectedAnimeStates.forEach {
+                repository.removeItemFromWatchList(title, it.animeItem.id)
+            }
+        }
+    }
+
+    fun hideItem(animeState: AnimeState, hide: Boolean = true) {
+        selectedAnimeStates.remove(animeState)
+        repository.updateAnimeStateVisibility(animeState.animeId, !hide)
+    }
+
+    fun hideSelectedItems(hide: Boolean = true) {
+        selectedAnimeStates.forEach {
+            hideItem(it, hide)
         }
     }
 
@@ -187,7 +210,7 @@ class MainViewModel : ViewModel() {
 
     fun updateAnimeLists() {
         CoroutineScope(Dispatchers.IO).launch {
-            allAnimeAssociatedWithWatchList.collectLatest { animeSet ->
+            allVisibleAnimeAssociatedWithWatchList.collectLatest { animeSet ->
                 animeSet.forEach { animeState ->
                     val episodes = repository.getEpisodesByAnimeId(animeState.animeItem.id)
                     val episodesAiredToday = episodes.filter { episode ->
@@ -239,7 +262,7 @@ class MainViewModel : ViewModel() {
             animeAirDateMap[it] = emptyList()
         }
         Log.i("MainViewModel", "Updating anime map for $weekInTheFuture")
-        allAnimeAssociatedWithWatchList.collectLatest { animeSet ->
+        allVisibleAnimeAssociatedWithWatchList.collectLatest { animeSet ->
             animeSet.forEach {
                 val episodes = repository.getEpisodesByAnimeId(it.animeId)
                 var nextEpisodeDate: ZonedDateTime? = null
@@ -276,7 +299,6 @@ class MainViewModel : ViewModel() {
         scope: CoroutineScope,
         context: Context
     ) = CoroutineScope(Dispatchers.IO).launch {
-        Log.i("MainViewModel", "Searching for $keyword")
         searching = true
         try {
             val result = repository.searchAnimeItemByKeyword(keyword)
@@ -322,25 +344,44 @@ class MainViewModel : ViewModel() {
 
     fun refreshDatabase(context: Context) {
         databaseRefreshing = true
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                repository.refreshDatabase{ progress, total->
-                    refreshingProgress = progress
-                    refreshingTotal = total
-                    if (progress == total){
-                        databaseRefreshing = false
-                        toastShort(context,context.getString(R.string.refreshed_database_successfully))
-                    }
+        try {
+            repository.refreshDatabase { progress, total ->
+                refreshingProgress = progress
+                refreshingTotal = total
+                if (progress == total) {
+                    databaseRefreshing = false
+                    toastShort(context, context.getString(R.string.refreshed_database_successfully))
                 }
-            } catch (e: WebApiClient.WebRequestException) {
-                databaseRefreshing = false
-                toastShort(context, e.message!!)
-                return@launch
             }
+        } catch (e: WebApiClient.WebRequestException) {
+            databaseRefreshing = false
+            toastShort(context, e.message!!)
+            return
         }
     }
 
-    fun toggleShowDeleteWatchListDialog(show:Boolean){
+    fun selectItem(animeState:AnimeState){
+        if (!selectedAnimeStates.contains(animeState)){
+            selectedAnimeStates.add(animeState)
+        }
+    }
+
+    fun toggleItem(animeState: AnimeState){
+        if (selectedAnimeStates.contains(animeState)){
+            selectedAnimeStates.remove(animeState)
+        }else{
+            selectedAnimeStates.add(animeState)
+        }
+    }
+
+    fun toggleActionMode(actionMode: Boolean) {
+        this.actionMode = actionMode
+        if (!actionMode) {
+            selectedAnimeStates.clear()
+        }
+    }
+
+    fun toggleShowDeleteWatchListDialog(show: Boolean) {
         showDeleteWatchListDialog = show
     }
 
