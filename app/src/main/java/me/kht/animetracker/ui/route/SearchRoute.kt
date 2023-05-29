@@ -105,7 +105,7 @@ fun SearchRoute(viewModel: MainViewModel, rootNavController: NavController) {
             Spacer(modifier = Modifier.height(10.dp))
             Divider()
 
-            if (viewModel.searching.value){
+            if (viewModel.searching){
                 Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(10.dp))

@@ -59,14 +59,56 @@ class MainViewModel : ViewModel() {
         time
     }
 
-    val searching = mutableStateOf(false)
+    private val _searching = mutableStateOf(false)
+    var searching: Boolean
+        get() = _searching.value
+        set(value) {
+            _searching.value = value
+        }
+
     val searchResult = mutableStateListOf<AnimeSearchedItem>()
 
-    val databaseExporting = mutableStateOf(false)
-    val databaseImporting = mutableStateOf(false)
-    val databaseRefreshing = mutableStateOf(false)
-    val refreshingProgress = mutableStateOf(0)
-    val refreshingTotal = mutableStateOf(0)
+    private val _databaseExporting = mutableStateOf(false)
+    var databaseExporting: Boolean
+        get() = _databaseExporting.value
+        private set(value) {
+            _databaseExporting.value = value
+        }
+
+    private val _databaseImporting = mutableStateOf(false)
+    var databaseImporting: Boolean
+        get() = _databaseImporting.value
+        private set(value) {
+            _databaseImporting.value = value
+        }
+
+    private val _databaseRefreshing = mutableStateOf(false)
+    var databaseRefreshing: Boolean
+        get() = _databaseRefreshing.value
+        private set(value) {
+            _databaseRefreshing.value = value
+        }
+
+    private val _refreshingProgress = mutableStateOf(0)
+    var refreshingProgress: Int
+        get() = _refreshingProgress.value
+        private set(value) {
+            _refreshingProgress.value = value
+        }
+
+    private val _refreshingTotal = mutableStateOf(0)
+    var refreshingTotal: Int
+        get() = _refreshingTotal.value
+        private set(value) {
+            _refreshingTotal.value = value
+        }
+
+    private val _showDeleteWatchListDialog = mutableStateOf(false)
+    var showDeleteWatchListDialog: Boolean
+        get() = _showDeleteWatchListDialog.value
+        private set(value) {
+            _showDeleteWatchListDialog.value = value
+        }
 
     suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
@@ -235,7 +277,7 @@ class MainViewModel : ViewModel() {
         context: Context
     ) = CoroutineScope(Dispatchers.IO).launch {
         Log.i("MainViewModel", "Searching for $keyword")
-        searching.value = true
+        searching = true
         try {
             val result = repository.searchAnimeItemByKeyword(keyword)
             searchResult.clear()
@@ -243,7 +285,7 @@ class MainViewModel : ViewModel() {
         } catch (e: WebApiClient.WebRequestException) {
             toastShort(context, context.getString(R.string.failed_to_search_for_anime))
         } finally {
-            searching.value = false
+            searching = false
         }
         scope.launch {
             state.animateScrollToItem(0)
@@ -255,9 +297,9 @@ class MainViewModel : ViewModel() {
     }
 
     fun exportDatabase(context: Context,uri:Uri){
-        databaseExporting.value = true
+        databaseExporting = true
         repository.exportDatabase(context,uri){ result ->
-            databaseExporting.value = false
+            databaseExporting = false
             if (result){
                 toastShort(context,context.getString(R.string.exported_database_successfully))
             }else{
@@ -267,9 +309,9 @@ class MainViewModel : ViewModel() {
     }
 
     fun importDatabase(context: Context,uri: Uri){
-        databaseImporting.value = true
+        databaseImporting = true
         repository.importDatabase(context, uri) { result ->
-            databaseImporting.value = false
+            databaseImporting = false
             if (result) {
                 toastShort(context, context.getString(R.string.imported_database_successfully))
             } else {
@@ -279,23 +321,27 @@ class MainViewModel : ViewModel() {
     }
 
     fun refreshDatabase(context: Context) {
-        databaseRefreshing.value = true
+        databaseRefreshing = true
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                repository.refreshDatabase(){ progress, total->
-                    refreshingProgress.value = progress
-                    refreshingTotal.value = total
+                repository.refreshDatabase{ progress, total->
+                    refreshingProgress = progress
+                    refreshingTotal = total
                     if (progress == total){
-                        databaseRefreshing.value = false
+                        databaseRefreshing = false
                         toastShort(context,context.getString(R.string.refreshed_database_successfully))
                     }
                 }
             } catch (e: WebApiClient.WebRequestException) {
-                databaseRefreshing.value = false
+                databaseRefreshing = false
                 toastShort(context, e.message!!)
                 return@launch
             }
         }
+    }
+
+    fun toggleShowDeleteWatchListDialog(show:Boolean){
+        showDeleteWatchListDialog = show
     }
 
     private fun toastShort(context: Context, msg: String) {

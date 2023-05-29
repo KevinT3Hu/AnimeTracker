@@ -49,7 +49,7 @@ interface WatchListCrossRefDao {
 @Dao
 interface WatchListDao {
 
-    @Query("INSERT INTO WatchList (title) VALUES (:title)")
+    @Query("INSERT INTO WatchList (title,archived) VALUES (:title,0)")
     suspend fun createNewWatchList(title: String)
 
     @Query("DELETE FROM WatchList WHERE title = :title")

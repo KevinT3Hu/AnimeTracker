@@ -142,11 +142,11 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val textHeight = with(LocalDensity.current) { MaterialTheme.typography.titleMedium.lineHeight.toDp() }
-                        AnimatedVisibility(visible = viewModel.databaseRefreshing.value) {
+                        AnimatedVisibility(visible = viewModel.databaseRefreshing) {
                             CircularProgressIndicator(modifier = Modifier.progressSemantics().size(textHeight))
                         }
                         Text(
-                            text = if (viewModel.databaseRefreshing.value) stringResource(id = R.string.database_refreshing,viewModel.refreshingProgress.value,viewModel.refreshingTotal.value) else stringResource(id = R.string.refresh_database),
+                            text = if (viewModel.databaseRefreshing) stringResource(id = R.string.database_refreshing,viewModel.refreshingProgress,viewModel.refreshingTotal) else stringResource(id = R.string.refresh_database),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -182,7 +182,7 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                     }, modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth()) {
-                        if (viewModel.databaseExporting.value){
+                        if (viewModel.databaseExporting){
                             CircularProgressIndicator()
                         }else{
                             Text(text = stringResource(id = R.string.export))
@@ -196,7 +196,7 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                     }, modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth()) {
-                        if (viewModel.databaseImporting.value) {
+                        if (viewModel.databaseImporting) {
                             CircularProgressIndicator()
                         } else {
                             Text(text = stringResource(id = R.string.import_))

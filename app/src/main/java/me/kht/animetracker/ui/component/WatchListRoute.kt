@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -17,12 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.launch
 import me.kht.animetracker.MainViewModel
+import me.kht.animetracker.R
 import me.kht.animetracker.ui.component.animedetail.AnimeDetailDialog
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -91,5 +96,26 @@ fun WatchListRoute(
         }else{
             AnimeDetailDialog(animeId = clickedAnimeItemId!!, dismissDialog = { showAnimeDetailDialog=false }, viewModel = viewModel)
         }
+    }
+
+    if (viewModel.showDeleteWatchListDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.toggleShowDeleteWatchListDialog(false) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteWatchList(allWatchList.value.find { it.watchList.title != viewModel.watchListTitle }?.watchList?.title)
+                    viewModel.toggleShowDeleteWatchListDialog(false)
+                }) {
+                    Text(text = stringResource(id = R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.toggleShowDeleteWatchListDialog(false) }) {
+                    Text(text = stringResource(id = R.string.cancel))
+                }
+            },
+            title = { Text(text = stringResource(R.string.delete_watch_list)) },
+            text = { Text(text = stringResource(R.string.delete_watch_list_confirm)) }
+        )
     }
 }

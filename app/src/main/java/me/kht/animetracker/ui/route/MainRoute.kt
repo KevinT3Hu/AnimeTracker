@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
@@ -57,6 +56,7 @@ import me.kht.animetracker.R
 import me.kht.animetracker.ui.component.AirScheduleRoute
 import me.kht.animetracker.ui.component.ArchivedRoute
 import me.kht.animetracker.ui.component.HomeRoute
+import me.kht.animetracker.ui.component.WatchListPageAppBar
 import me.kht.animetracker.ui.component.WatchListRoute
 import me.kht.animetracker.ui.theme.Dimension
 
@@ -67,7 +67,6 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showNewWatchListDialog by remember { mutableStateOf(false) }
-    var showDeleteWatchListDialog by remember { mutableStateOf(false) }
 
     val allWatchList = viewModel.allWatchList.collectAsState(initial = emptyList())
 
@@ -179,7 +178,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
                     // Archived
                     NavigationDrawerItem(
                         icon = { Icon(painter = painterResource(id = R.drawable.archive), contentDescription = "") },
-                        label = { Text(text = "Archived Watch Lists") },
+                        label = { Text(text = stringResource(id = R.string.archived_watch_lists)) },
                         selected = currentRoute.value?.destination?.route == NavigationRoute.ARCHIVED_WATCHLIST,
                         onClick = {
                             routeNavController.navigateTo(NavigationRoute.ARCHIVED_WATCHLIST)
@@ -220,59 +219,30 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
         ) {
             Scaffold(
                 topBar = {
-                    TopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        title = {
-                            Text(
-                                text = when (currentRoute.value?.destination?.route) {
-                                    NavigationRoute.HOME_ROUTE -> stringResource(R.string.app_name)
-                                    NavigationRoute.SCHEDULE_ROUTE -> stringResource(R.string.air_schedule)
-                                    NavigationRoute.ARCHIVED_WATCHLIST -> stringResource(R.string.archived_watch_lists)
-                                    else -> viewModel.watchListTitle
-                                }
-                            )
-                        },
-                        actions = {
-                            if (currentRoute.value?.destination?.route == NavigationRoute.WATCHLIST_ROUTE) {
-                                // delete
-                                IconButton(onClick = {
-                                    showDeleteWatchListDialog = true
-                                }) {
+                    if (currentRoute.value?.destination?.route == NavigationRoute.WATCHLIST_ROUTE){
+                        WatchListPageAppBar(viewModel = viewModel, drawerState = drawerState, routeNavController = routeNavController)
+                    }else{
+                        TopAppBar(
+                            navigationIcon = {
+                                IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                     Icon(
-                                        imageVector = Icons.Default.Delete,
+                                        imageVector = Icons.Default.Menu,
                                         contentDescription = null
                                     )
                                 }
-
-                                val watchList = allWatchList.value.find { it.watchList.title == viewModel.watchListTitle }!!
-                                // archive
-                                if (watchList.watchList.archived){
-                                    IconButton(onClick = {
-                                        viewModel.unarchiveWatchList(watchList.watchList.title)
-                                    }) {
-                                        Icon(painter = painterResource(id = R.drawable.unarchive), contentDescription = "")
+                            },
+                            title = {
+                                Text(
+                                    text = when (currentRoute.value?.destination?.route) {
+                                        NavigationRoute.HOME_ROUTE -> stringResource(R.string.app_name)
+                                        NavigationRoute.SCHEDULE_ROUTE -> stringResource(R.string.air_schedule)
+                                        NavigationRoute.ARCHIVED_WATCHLIST -> stringResource(R.string.archived_watch_lists)
+                                        else -> viewModel.watchListTitle
                                     }
-                                }else{
-                                    IconButton(onClick = {
-                                        viewModel.archiveWatchList()
-                                        routeNavController.navigateTo(NavigationRoute.HOME_ROUTE)
-                                    }) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.archive),
-                                            contentDescription = null
-                                        )
-                                    }
-                                }
+                                )
                             }
-                        }
-                    )
+                        )
+                    }
                 },
                 floatingActionButton = {
                     if (currentRoute.value?.destination?.route == "watchlist") {
@@ -336,26 +306,7 @@ fun MainRoute(viewModel: MainViewModel, rootNavController: NavController, finish
         )
     }
 
-    if (showDeleteWatchListDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteWatchListDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.deleteWatchList(allWatchList.value.find { it.watchList.title != viewModel.watchListTitle }?.watchList?.title)
-                    showDeleteWatchListDialog = false
-                }) {
-                    Text(text = stringResource(id = R.string.confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteWatchListDialog = false }) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-            },
-            title = { Text(text = stringResource(R.string.delete_watch_list)) },
-            text = { Text(text = stringResource(R.string.delete_watch_list_confirm)) }
-        )
-    }
+
 }
 
 private fun NavController.navigateTo(route: String) {
