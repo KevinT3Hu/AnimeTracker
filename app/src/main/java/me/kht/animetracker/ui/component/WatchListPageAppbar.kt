@@ -1,6 +1,7 @@
 package me.kht.animetracker.ui.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -25,7 +26,7 @@ import me.kht.animetracker.MainViewModel
 import me.kht.animetracker.NavigationRoute
 import me.kht.animetracker.R
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class,ExperimentalAnimationApi::class)
 @Composable
 fun WatchListPageAppBar(viewModel: MainViewModel,drawerState:DrawerState,routeNavController:NavController) {
 
