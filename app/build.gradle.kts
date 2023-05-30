@@ -8,6 +8,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
     id("com.google.android.gms.oss-licenses-plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -63,28 +65,41 @@ android {
 
 dependencies {
 
-    implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
-    implementation("com.google.accompanist:accompanist-flowlayout:0.31.1-alpha")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0-RC")
-    implementation(platform("androidx.compose:compose-bom:2022.10.00"))
+    val firebaseBOM = platform("com.google.firebase:firebase-bom:32.0.0")
+    implementation(firebaseBOM)
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+
+    val roomVersion = "2.5.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+
+
+    val composeBOM = platform("androidx.compose:compose-bom:2023.05.01")
+    implementation(composeBOM)
     implementation("androidx.compose.ui:ui-graphics")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2022.10.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
 
-    val room_version = "2.5.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
+    androidTestImplementation(composeBOM)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    debugImplementation(composeBOM)
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 
-    val compose_version = "1.4.2"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
     implementation("androidx.core:core-ktx:1.11.0-alpha03")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.1")
-    implementation("androidx.compose.ui:ui:$compose_version")
-    implementation("androidx.compose.ui:ui-tooling-preview:$compose_version")
-    implementation("androidx.compose.material3:material3:1.1.0-rc01")
+    implementation("androidx.activity:activity-compose:1.7.2")
+
+    implementation("androidx.navigation:navigation-compose:2.7.0-alpha01")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.31.1-alpha")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0-RC")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation("io.coil-kt:coil:2.3.0")
@@ -92,7 +107,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
-    debugImplementation("androidx.compose.ui:ui-tooling:$compose_version")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+
 }

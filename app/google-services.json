@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "437416642606",
+    "project_id": "anime-tracker-c4dd1",
+    "storage_bucket": "anime-tracker-c4dd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:437416642606:android:2dd480a0da7caa9bf8f7bf",
+        "android_client_info": {
+          "package_name": "me.kht.animetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3T01AK3hu3ad0F8uyBvhfEvXylnWmm3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

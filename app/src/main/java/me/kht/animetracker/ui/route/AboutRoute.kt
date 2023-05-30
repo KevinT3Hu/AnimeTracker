@@ -105,14 +105,18 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                         val textHeight = with(LocalDensity.current) { MaterialTheme.typography.titleMedium.lineHeight.toDp() }
                         Row(modifier=modifier) {
                            Text(text = "Project hosted on GitHub: ", style = MaterialTheme.typography.titleMedium)
-                           Image(painter = painterResource(id = R.drawable.github_mark), contentDescription = "", modifier = Modifier.height(textHeight).clickable {
-                               val intent = Intent(Intent.ACTION_VIEW).apply {
-                                      data = Uri.parse(BuildConfig.PROJECT_URL)
-                               }
-                               intent.resolveActivity(context.packageManager)?.let {
-                                   context.startActivity(intent)
-                               }
-                           })
+                           Image(painter = painterResource(id = R.drawable.github_mark), contentDescription = "", modifier = Modifier
+                               .height(textHeight)
+                               .clickable {
+                                   val intent = Intent(Intent.ACTION_VIEW).apply {
+                                       data = Uri.parse(BuildConfig.PROJECT_URL)
+                                   }
+                                   intent
+                                       .resolveActivity(context.packageManager)
+                                       ?.let {
+                                           context.startActivity(intent)
+                                       }
+                               })
                         }
                     }
                 }
@@ -143,7 +147,9 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                     ) {
                         val textHeight = with(LocalDensity.current) { MaterialTheme.typography.titleMedium.lineHeight.toDp() }
                         AnimatedVisibility(visible = viewModel.databaseRefreshing) {
-                            CircularProgressIndicator(modifier = Modifier.progressSemantics().size(textHeight))
+                            CircularProgressIndicator(modifier = Modifier
+                                .progressSemantics()
+                                .size(textHeight))
                         }
                         Text(
                             text = if (viewModel.databaseRefreshing) stringResource(id = R.string.database_refreshing,viewModel.refreshingProgress,viewModel.refreshingTotal) else stringResource(id = R.string.refresh_database),
@@ -162,6 +168,21 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                     ) {
                         Text(
                             text = stringResource(id = R.string.third_party_licenses),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+
+                // Test crash
+                Card(modifier = cardModifier, onClick = {
+                    throw RuntimeException("Test crash")
+                }) {
+                    Column(
+                        modifier = cardContentModifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.test_crash),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
