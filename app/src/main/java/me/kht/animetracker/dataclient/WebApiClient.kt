@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
-import me.kht.animetracker.JsonSerializer
+import me.kht.animetracker.seializer.JsonSerializer
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeSearchedItem
 import me.kht.animetracker.model.Episode

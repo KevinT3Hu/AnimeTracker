@@ -18,7 +18,9 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +35,7 @@ import kotlinx.coroutines.launch
 import me.kht.animetracker.MainViewModel
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeState
+import me.kht.animetracker.model.Episode
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -47,7 +50,7 @@ fun AnimeStateItem(
 
     val scope = rememberCoroutineScope()
 
-    val episodes = List(animeState.animeItem.eps) { it + 1 }
+    val episodes = remember { mutableStateListOf<Episode>() }
 
     val canvasSize = 40.dp
     val canvasHorizontalPadding = 5.dp
@@ -55,14 +58,23 @@ fun AnimeStateItem(
 
     val backgroundColor = if (selected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surface
 
-    Box(modifier = modifier.wrapContentSize(align = Alignment.TopStart).background(backgroundColor)) {
+    LaunchedEffect(key1 = animeState){
+        scope.launch {
+            episodes.clear()
+            episodes.addAll(viewModel.getAnimeEpisodesById(animeState.animeId))
+        }
+    }
+
+    Box(modifier = modifier
+        .wrapContentSize(align = Alignment.TopStart)
+        .background(backgroundColor)) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    if (viewModel.actionMode){
+                    if (viewModel.actionMode) {
                         viewModel.toggleItem(animeState)
-                    }else{
+                    } else {
                         onClick.invoke(animeState.animeItem)
                     }
                 },
@@ -94,17 +106,17 @@ fun AnimeStateItem(
                             var epSelected by remember {
                                 mutableStateOf(
                                     animeState.watchedEpisodes.contains(
-                                        ep
+                                        ep.ep
                                     )
                                 )
                             }
 
                             var airState by remember { mutableStateOf(EpisodeState.NOT_AIRED) }
                             scope.launch {
-                                airState = viewModel.isEpisodeAired(animeState.animeItem.id, ep)
+                                airState = viewModel.isEpisodeAired(animeState.animeItem.id, ep.ep)
                             }
                             EpisodeMarker(
-                                ep,
+                                ep.ep,
                                 airState,
                                 epSelected,
                                 canvasSize = canvasSize,
@@ -112,7 +124,7 @@ fun AnimeStateItem(
                             ) {
                                 viewModel.markEpisodeWatchedState(
                                     animeState.animeItem.id,
-                                    ep,
+                                    ep.ep,
                                     it
                                 )
                                 epSelected = it

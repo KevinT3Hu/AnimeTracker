@@ -20,6 +20,7 @@ import me.kht.animetracker.model.AnimeSearchedItem
 import me.kht.animetracker.model.AnimeState
 import me.kht.animetracker.model.Episode
 import me.kht.animetracker.ui.component.EpisodeState
+import java.net.SocketTimeoutException
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Calendar
@@ -119,7 +120,7 @@ class MainViewModel : ViewModel() {
         }
     val selectedAnimeStates = mutableStateListOf<AnimeState>()
 
-    suspend fun isEpisodeAired(animeId: Int, episodeIndex: Int): EpisodeState {
+    suspend fun isEpisodeAired(animeId: Int, episodeIndex: Float): EpisodeState {
         val cacheKey = "$animeId-$episodeIndex"
         if (episodeStateCache.containsKey(cacheKey)) {
             Log.i("MainViewModel", "Cache hit for $cacheKey")
@@ -133,13 +134,17 @@ class MainViewModel : ViewModel() {
                 repository.addEpisodes(episodes)
             }
             val episodeState = getEpisodeState(episode)
-            episodeStateCache["$animeId-$episodeIndex"] = episodeState
+            episodeStateCache[cacheKey] = episodeState
             episodeState
         }
     }
 
     suspend fun getAnimeItemById(animeId: Int): AnimeItem {
         return repository.getAnimeItemById(animeId)
+    }
+
+    suspend fun getAnimeEpisodesById(animeId: Int): List<Episode> {
+        return repository.getEpisodesByAnimeId(animeId)
     }
 
     fun addItemToWatchList(title: String, animeId: Int) {
@@ -162,11 +167,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun removeSelectedItemsFromWatchList(title: String = watchListTitle) {
-        selectedAnimeStates.clear()
         CoroutineScope(Dispatchers.IO).launch {
             selectedAnimeStates.forEach {
                 repository.removeItemFromWatchList(title, it.animeItem.id)
             }
+            selectedAnimeStates.clear()
         }
     }
 
@@ -177,8 +182,9 @@ class MainViewModel : ViewModel() {
 
     fun hideSelectedItems(hide: Boolean = true) {
         selectedAnimeStates.forEach {
-            hideItem(it, hide)
+            repository.updateAnimeStateVisibility(it.animeId, !hide)
         }
+        selectedAnimeStates.clear()
     }
 
     fun newWatchList(title: String) {
@@ -186,7 +192,7 @@ class MainViewModel : ViewModel() {
         watchListTitle = title
     }
 
-    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Int, watched: Boolean) {
+    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Float, watched: Boolean) {
         repository.markEpisodeWatchedState(animeId, episodeIndex, watched)
         // initAnimeLists()
     }
@@ -214,14 +220,14 @@ class MainViewModel : ViewModel() {
                 animeSet.forEach { animeState ->
                     val episodes = repository.getEpisodesByAnimeId(animeState.animeItem.id)
                     val episodesAiredToday = episodes.filter { episode ->
-                        episode.ep != 0 &&
+                        episode.ep != 0f &&
                                 getEpisodeState(episode) == EpisodeState.TODAY
                     }
                     if (episodesAiredToday.isNotEmpty() && !animeAirToday.contains(animeState.animeItem)) {
                         animeAirToday.add(animeState.animeItem)
                     }
                     val episodesNotWatched = episodes.filter { episode ->
-                        episode.ep != 0 &&
+                        episode.ep != 0f &&
                                 getEpisodeState(episode) != EpisodeState.NOT_AIRED &&
                                 animeState.watchedEpisodes.find { epi -> epi == episode.ep } == null
                     }
@@ -276,7 +282,7 @@ class MainViewModel : ViewModel() {
                     val time =
                         ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneId.systemDefault())
 
-                    if (episode.ep != 0 &&
+                    if (episode.ep != 0f &&
                         weekInTheFuture.contains(time)
                     ) {
                         nextEpisodeDate = time
@@ -306,6 +312,8 @@ class MainViewModel : ViewModel() {
             searchResult.addAll(result)
         } catch (e: WebApiClient.WebRequestException) {
             toastShort(context, context.getString(R.string.failed_to_search_for_anime))
+        } catch (e:SocketTimeoutException){
+            toastShort(context,"Search Timeout")
         } finally {
             searching = false
         }

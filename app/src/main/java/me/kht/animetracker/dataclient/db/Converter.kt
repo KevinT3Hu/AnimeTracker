@@ -5,13 +5,13 @@ import androidx.room.TypeConverter
 class Converter {
 
     @TypeConverter
-    fun mutableSetToString(set: MutableSet<Int>): String {
+    fun mutableSetToString(set: MutableSet<Float>): String {
         return set.joinToString(",")
     }
 
     @TypeConverter
-    fun stringToMutableSet(string: String): MutableSet<Int> {
+    fun stringToMutableSet(string: String): MutableSet<Float> {
         return if (string.isEmpty()) mutableSetOf()
-        else string.split(",").map { it.toInt() }.toMutableSet()
+        else string.split(",").map { it.toFloat() }.toMutableSet()
     }
 }

@@ -30,7 +30,7 @@ import kotlin.math.sqrt
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun EpisodeMarker(
-    episode: Int,
+    episode: Float,
     airState: EpisodeState,
     watched: Boolean,
     canvasSize: Dp,
@@ -42,14 +42,17 @@ fun EpisodeMarker(
     val primaryContainerColor = MaterialTheme.colorScheme.primaryContainer
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val secondaryColor = Color.Gray
-    val textMeasurer = rememberTextMeasurer()
-    val textLayoutResult = textMeasurer.measure(episode.toString(), TextStyle(fontSize = fontSize))
-    val textSize = textLayoutResult.size
     val enabled = airState != EpisodeState.NOT_AIRED
 
     val backgroundColor = if (watched) primaryContainerColor else Color.Transparent
 
+    // if episode is integer, show it as integer
+    val episodeText = if (episode % 1 == 0f) episode.toInt().toString() else episode.toString()
     val textColor = if (enabled) onSurfaceColor else secondaryColor
+
+    val textMeasurer = rememberTextMeasurer()
+    val textLayoutResult = textMeasurer.measure(episodeText, TextStyle(fontSize = fontSize))
+    val textSize = textLayoutResult.size
 
     val modifier =
         if (enabled) Modifier.clickable { onCheckedChange(!watched) } else Modifier.pointerInput(
@@ -73,7 +76,7 @@ fun EpisodeMarker(
         drawRoundRect(color = backgroundColor, cornerRadius = CornerRadius(5f, 5f))
         drawText(
             textMeasurer = textMeasurer,
-            text = episode.toString(),
+            text = episodeText,
             style = TextStyle(color = textColor, fontSize = fontSize),
             topLeft = center
         )

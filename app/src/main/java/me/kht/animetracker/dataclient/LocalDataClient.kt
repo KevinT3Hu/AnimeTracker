@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import me.kht.animetracker.JsonSerializer
+import me.kht.animetracker.seializer.JsonSerializer
 import me.kht.animetracker.dataclient.db.WatchListDatabase
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.AnimeState
@@ -73,8 +73,8 @@ class LocalDataClient(db: WatchListDatabase) {
 
     suspend fun getEpisodesByAnimeId(animeId: Int) = episodeDao.getEpisodesByAnimeId(animeId)
 
-    suspend fun getEpisodeByAnimeId(animeId: Int, ep: Int) =
-        episodeDao.getEpisodeByAnimeId(animeId, ep)
+    suspend fun getEpisodeByAnimeId(animeId: Int, id: Float) =
+        episodeDao.getEpisodeByAnimeId(animeId, id)
 
     fun removeItemFromWatchList(title: String, animeId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -82,7 +82,7 @@ class LocalDataClient(db: WatchListDatabase) {
         }
     }
 
-    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Int, watched: Boolean) {
+    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Float, watched: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             val animeState = animeStateDao.getAnimeStateByIdStatic(animeId)
             if (animeState != null) {

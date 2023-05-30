@@ -10,6 +10,6 @@ import kotlinx.serialization.Serializable
 data class Episode(
     @PrimaryKey val id: Int,
     @SerialName("subject_id") val animeId: Int,
-    val ep: Int,
+    val ep: Float,
     @SerialName("airdate") val airDate: String,
 )

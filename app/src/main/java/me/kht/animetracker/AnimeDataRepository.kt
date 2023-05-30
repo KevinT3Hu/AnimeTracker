@@ -12,6 +12,7 @@ import me.kht.animetracker.dataclient.WebApiClient
 import me.kht.animetracker.dataclient.db.WatchListDatabase
 import me.kht.animetracker.dataclient.db.migration1_2
 import me.kht.animetracker.dataclient.db.migration2_3
+import me.kht.animetracker.dataclient.db.migration3_4
 import me.kht.animetracker.model.AnimeItem
 import me.kht.animetracker.model.Episode
 
@@ -34,14 +35,14 @@ class AnimeDataRepository(db: WatchListDatabase) {
 
     suspend fun getEpisodesByAnimeId(animeId: Int) = localDataClient.getEpisodesByAnimeId(animeId)
 
-    suspend fun getEpisodeByAnimeId(animeId: Int, ep: Int) =
+    suspend fun getEpisodeByAnimeId(animeId: Int, ep: Float) =
         localDataClient.getEpisodeByAnimeId(animeId, ep)
 
     fun addEpisodes(episodes: List<Episode>) = localDataClient.addEpisodes(episodes)
 
     fun getAllVisibleAnimeAssociatedWithWatchList() = localDataClient.getAllVisibleAnimeAssociatedWithWatchList()
 
-    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Int, watched: Boolean) =
+    fun markEpisodeWatchedState(animeId: Int, episodeIndex: Float, watched: Boolean) =
         localDataClient.markEpisodeWatchedState(animeId, episodeIndex, watched)
 
     fun createNewWatchList(title: String) = localDataClient.createNewWatchList(title)
@@ -109,7 +110,7 @@ class AnimeDataRepository(db: WatchListDatabase) {
                 context,
                 WatchListDatabase::class.java,
                 "watchlist"
-            ).addMigrations(migration1_2, migration2_3).build()
+            ).addMigrations(migration1_2, migration2_3, migration3_4).build()
             instance = AnimeDataRepository(database)
         }
 

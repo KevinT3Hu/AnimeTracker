@@ -1,4 +1,4 @@
-package me.kht.animetracker
+package me.kht.animetracker.seializer
 
 import kotlinx.serialization.json.Json
 

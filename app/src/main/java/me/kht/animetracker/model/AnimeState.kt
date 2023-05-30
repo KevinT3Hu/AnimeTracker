@@ -12,10 +12,11 @@ data class AnimeState(
     @PrimaryKey @ColumnInfo(index = true) val animeId: Int,
     @Embedded val animeItem: AnimeItem,
     val favorite: Boolean = false,
-    val watchedEpisodes: MutableSet<Int> = mutableSetOf(),
+    // episode index
+    val watchedEpisodes: MutableSet<Float> = mutableSetOf(),
     val visibility: Boolean = true,
 ) {
-    fun markEpisodeWatchedState(episodeIndex: Int, watched: Boolean) {
+    fun markEpisodeWatchedState(episodeIndex: Float, watched: Boolean) {
         if (watched) {
             watchedEpisodes.add(episodeIndex)
         } else {
