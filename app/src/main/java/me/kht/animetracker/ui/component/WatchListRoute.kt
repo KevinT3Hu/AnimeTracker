@@ -1,6 +1,7 @@
 package me.kht.animetracker.ui.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -137,12 +138,12 @@ fun WatchListRoute(
 
         AlertDialog(onDismissRequest = { showInvisibleItemsDialog=false }){
             Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(Dimension.alertDialogRoundedCorner)) {
-                LazyColumn{
+                LazyColumn(){
                     items(invisibleInWatchList){
-                        Column(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.fillMaxWidth().clickable {  }) {
                             Row(modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                                .padding(vertical = 5.dp, horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(text = it.animeItem.nameCN, modifier = Modifier.weight(9f))
                                 IconButton(onClick = { viewModel.hideItem(it,false) }, modifier = Modifier.weight(1f)) {
                                     Icon(painter = painterResource(id = R.drawable.visibility_on), contentDescription = null)

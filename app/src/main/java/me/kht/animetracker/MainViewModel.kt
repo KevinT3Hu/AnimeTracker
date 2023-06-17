@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -91,18 +92,18 @@ class MainViewModel : ViewModel() {
             _databaseRefreshing.value = value
         }
 
-    private val _refreshingProgress = mutableStateOf(0)
+    private val _refreshingProgress = mutableIntStateOf(0)
     var refreshingProgress: Int
-        get() = _refreshingProgress.value
+        get() = _refreshingProgress.intValue
         private set(value) {
-            _refreshingProgress.value = value
+            _refreshingProgress.intValue = value
         }
 
-    private val _refreshingTotal = mutableStateOf(0)
+    private val _refreshingTotal = mutableIntStateOf(0)
     var refreshingTotal: Int
-        get() = _refreshingTotal.value
+        get() = _refreshingTotal.intValue
         private set(value) {
-            _refreshingTotal.value = value
+            _refreshingTotal.intValue = value
         }
 
     private val _showDeleteWatchListDialog = mutableStateOf(false)
@@ -359,6 +360,7 @@ class MainViewModel : ViewModel() {
                 if (progress == total) {
                     databaseRefreshing = false
                     toastShort(context, context.getString(R.string.refreshed_database_successfully))
+                    updateAnimeLists()
                 }
             }
         } catch (e: WebApiClient.WebRequestException) {
