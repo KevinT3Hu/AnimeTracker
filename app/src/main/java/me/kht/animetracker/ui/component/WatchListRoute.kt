@@ -138,7 +138,7 @@ fun WatchListRoute(
 
         AlertDialog(onDismissRequest = { showInvisibleItemsDialog=false }){
             Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(Dimension.alertDialogRoundedCorner)) {
-                LazyColumn(){
+                LazyColumn{
                     items(invisibleInWatchList){
                         Column(modifier = Modifier.fillMaxWidth().clickable {  }) {
                             Row(modifier = Modifier

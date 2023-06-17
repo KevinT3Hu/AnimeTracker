@@ -21,7 +21,7 @@ import me.kht.animetracker.model.AnimeItem
 @Composable
 fun AnimeDetailTags(tags:List<AnimeItem.Tag>){
     Log.i("AnimeDetailTags", "tags: $tags")
-    FlowRow() {
+    FlowRow {
         tags.forEach { tag->
             val tagString = buildAnnotatedString {
                 append(tag.name)
