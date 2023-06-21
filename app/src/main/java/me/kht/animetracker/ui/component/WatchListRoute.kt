@@ -1,5 +1,6 @@
 package me.kht.animetracker.ui.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -82,6 +83,12 @@ fun WatchListRoute(
         }
     }
 
+    if (viewModel.actionMode){
+        BackHandler {
+            viewModel.toggleActionMode(false)
+        }
+    }
+
     LazyColumn(horizontalAlignment = Alignment.Start, state = scrollState) {
         items(
             items = visibleInWatchList,
@@ -140,7 +147,9 @@ fun WatchListRoute(
             Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(Dimension.alertDialogRoundedCorner)) {
                 LazyColumn{
                     items(invisibleInWatchList){
-                        Column(modifier = Modifier.fillMaxWidth().clickable {  }) {
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { }) {
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 5.dp, horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {

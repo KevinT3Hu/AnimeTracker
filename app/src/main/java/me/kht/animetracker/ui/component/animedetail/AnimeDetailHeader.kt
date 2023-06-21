@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,7 +59,7 @@ fun AnimeDetailHeader(animeItem: AnimeItem?,showAdd:Boolean=false,viewModel: Mai
                     context.startActivity(intent)
                 }
             }) {
-                Text(text = "View on Bangumi")
+                Text(text = "Bangumi")
             }
             if (showAdd) {
                 AnimatedContent(targetState = contained) { state ->
@@ -68,14 +67,18 @@ fun AnimeDetailHeader(animeItem: AnimeItem?,showAdd:Boolean=false,viewModel: Mai
                         viewModel.addItemToWatchList(viewModel.watchListTitle, animeItem!!.id)
                         contained = true
                     }, enabled = !state) {
+
+                        val disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.32f)
+                        val enabledTextColor = MaterialTheme.colorScheme.onSurface
+
                         Text(
                             text = if (state) stringResource(
                                 R.string.added,
                                 viewModel.watchListTitle
                             ) else stringResource(id = R.string.add_to_list),
-                            color = if (state) Color.Gray else Color.Black
+                            color = if (state) disabledTextColor else enabledTextColor
                         )
-                        }
+                    }
                 }
             }
         }
