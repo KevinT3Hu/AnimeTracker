@@ -96,16 +96,23 @@ fun WatchListRoute(
                 it.animeId
             }
         ) { animeState ->
+
+            var expanded by remember { mutableStateOf(false) }
+
             AnimeStateItem(
                 animeState = animeState,
                 viewModel = viewModel,
                 modifier = Modifier.animateItemPlacement(),
-                onClick = { animeItem ->
-                    clickedAnimeItemId = animeItem.id
-                    showAnimeDetailDialog = true
+                onClick = {
+                    expanded = !expanded
                 },
                 horizontalPadding = 16.dp,
-                selected = viewModel.selectedAnimeStates.contains(animeState)
+                selected = viewModel.selectedAnimeStates.contains(animeState),
+                expanded = expanded,
+                onDetail = { animeItem ->
+                    clickedAnimeItemId = animeItem.id
+                    showAnimeDetailDialog = true
+                }
             )
         }
         item {
