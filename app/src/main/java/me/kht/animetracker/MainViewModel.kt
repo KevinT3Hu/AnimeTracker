@@ -179,12 +179,14 @@ class MainViewModel : ViewModel() {
     fun hideItem(animeState: AnimeState, hide: Boolean = true) {
         selectedAnimeStates.remove(animeState)
         repository.updateAnimeStateVisibility(animeState.animeId, !hide)
+        updateAnimeMap()
     }
 
     fun hideSelectedItems(hide: Boolean = true) {
         selectedAnimeStates.forEach {
             repository.updateAnimeStateVisibility(it.animeId, !hide)
         }
+        updateAnimeMap()
         selectedAnimeStates.clear()
     }
 
@@ -360,7 +362,7 @@ class MainViewModel : ViewModel() {
                 if (progress == total) {
                     databaseRefreshing = false
                     toastShort(context, context.getString(R.string.refreshed_database_successfully))
-                    updateAnimeLists()
+                    updateAnimeMap()
                 }
             }
         } catch (e: WebApiClient.WebRequestException) {
