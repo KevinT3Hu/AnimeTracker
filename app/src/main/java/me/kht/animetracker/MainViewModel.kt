@@ -353,10 +353,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun refreshDatabase(context: Context) {
+    fun refreshDatabase(context: Context,watchListTitle:String?=null) {
         databaseRefreshing = true
         try {
-            repository.refreshDatabase { progress, total ->
+            repository.refreshDatabase(watchListTitle) { progress, total ->
                 refreshingProgress = progress
                 refreshingTotal = total
                 if (progress == total) {

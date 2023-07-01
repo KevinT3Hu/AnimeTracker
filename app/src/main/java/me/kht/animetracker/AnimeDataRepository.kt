@@ -65,11 +65,13 @@ class AnimeDataRepository(db: WatchListDatabase) {
     suspend fun watchListContains(watchListTitle: String, animeId: Int) =
         localDataClient.watchListContains(watchListTitle, animeId)
 
-    fun refreshDatabase(workerThreadCount: Int = 10, progress: (Int, Int) -> Unit = { _, _ -> }) =
+    fun refreshDatabase(watchListTitle: String?, workerThreadCount: Int = 10,progress: (Int, Int) -> Unit = { _, _ -> }) =
         CoroutineScope(Dispatchers.IO).launch {
-            // update anime states
-            val animeStates = localDataClient.getAllAnimeStatesStatic()
-            val episodes = localDataClient.getAllEpisodesStatic()
+
+            val animeStates = if (watchListTitle==null) localDataClient.getAllAnimeStatesStatic() else localDataClient.getWatchListByTitleStatic(watchListTitle)?.items?: emptyList()
+            val episodes = localDataClient.getAllEpisodesStatic().filter {  episode ->
+                animeStates.any { animeState -> animeState.animeId == episode.animeId }
+            }
 
             val total = animeStates.size + episodes.size
             Log.i("AnimeDataRepository", "total: $total")

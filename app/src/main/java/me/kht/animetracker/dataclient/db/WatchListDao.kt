@@ -22,6 +22,10 @@ interface WatchListCrossRefDao {
     fun getWatchListByTitle(title: String): Flow<WatchList>
 
     @Transaction
+    @Query("SELECT * FROM WatchList WHERE title = :title")
+    suspend fun getWatchListByTitleStatic(title: String): WatchList?
+
+    @Transaction
     @Query("INSERT INTO WatchListAnimeStateCrossRef (title,animeId) VALUES (:title,:animeId)")
     suspend fun addAnimeStateToWatchList(animeId: Int, title: String)
 

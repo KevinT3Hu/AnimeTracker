@@ -33,6 +33,8 @@ class LocalDataClient(db: WatchListDatabase) {
 
     fun getAllWatchList() = watchListCrossRefDao.getAllWatchLists()
 
+    suspend fun getWatchListByTitleStatic(title: String) = watchListCrossRefDao.getWatchListByTitleStatic(title)
+
     fun createNewWatchList(title: String) {
         CoroutineScope(Dispatchers.IO).launch {
             watchListDao.createNewWatchList(title)

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -31,6 +33,7 @@ import me.kht.animetracker.R
 fun WatchListPageAppBar(viewModel: MainViewModel,drawerState:DrawerState,routeNavController:NavController) {
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val allWatchList = viewModel.allWatchList.collectAsState(initial = emptyList())
 
@@ -99,6 +102,12 @@ fun WatchListPageAppBar(viewModel: MainViewModel,drawerState:DrawerState,routeNa
                     }
                 },
                 actions = {
+
+                    // Refresh
+                    IconButton(onClick = { viewModel.refreshDatabase(context,viewModel.watchListTitle) }) {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
+                    }
+
                     // Delete
                     IconButton(onClick = { viewModel.removeSelectedItemsFromWatchList() }) {
                         Icon(
