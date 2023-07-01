@@ -38,4 +38,6 @@
     <string name="items_selected" tools:ignore="PluralsCandidate">%1$d Selected</string>
     <string name="test_crash">Test crash</string>
     <string name="details">Details</string>
+    <string name="clear_unused_data">Clear unused data</string>
+    <string name="cleared_unused_data_successfully">Cleard</string>
 </resources>

@@ -1,6 +1,7 @@
 package me.kht.animetracker.dataclient.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -34,4 +35,7 @@ interface AnimeStateDao {
 
     @Query("UPDATE AnimeState SET visibility = :visibility WHERE animeId = :id")
     suspend fun updateAnimeStateVisibility(id: Int, visibility: Boolean)
+
+    @Delete
+    suspend fun deleteAnimeStates(animeStates:List<AnimeState>)
 }

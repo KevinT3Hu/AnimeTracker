@@ -372,6 +372,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun clearUnusedData(context: Context){
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.clearUnusedData{
+                toastShort(context,context.getString(R.string.cleared_unused_data_successfully))
+            }
+        }
+    }
+
     fun selectItem(animeState:AnimeState){
         if (!selectedAnimeStates.contains(animeState)){
             selectedAnimeStates.add(animeState)

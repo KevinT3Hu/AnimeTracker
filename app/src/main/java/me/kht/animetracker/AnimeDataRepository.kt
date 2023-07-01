@@ -104,6 +104,11 @@ class AnimeDataRepository(db: WatchListDatabase) {
     fun updateAnimeStateVisibility(animeId: Int, visibility: Boolean) =
         localDataClient.updateAnimeStateVisibility(animeId, visibility)
 
+    fun clearUnusedData(onFinished:()->Unit) = CoroutineScope(Dispatchers.IO).launch {
+        localDataClient.clearUnusedData()
+        onFinished()
+    }
+
     companion object {
         private var instance: AnimeDataRepository? = null
 

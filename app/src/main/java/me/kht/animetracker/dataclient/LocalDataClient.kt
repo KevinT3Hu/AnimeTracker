@@ -190,6 +190,28 @@ class LocalDataClient(db: WatchListDatabase) {
         onDone.invoke(true)
     }
 
+    suspend fun clearUnusedData(){
+
+        val watchListCrossRefs = watchListCrossRefDao.getAllWatchListCrossRefStatic()
+        val animeStates = animeStateDao.getAllAnimeStatesStatic()
+        val episodes = episodeDao.getAllEpisodesStatic()
+
+        val animeStatesToDelete = animeStates.filter { animeState ->
+            watchListCrossRefs.none {
+                it.animeId==animeState.animeId
+            }
+        }
+
+        val episodesToDelete = episodes.filter { episode ->
+            animeStatesToDelete.any {
+                it.animeId==episode.animeId
+            }
+        }
+
+        animeStateDao.deleteAnimeStates(animeStatesToDelete)
+        episodeDao.deleteEpisodes(episodesToDelete)
+    }
+
     suspend fun watchListContains(watchListTitle: String, animeId: Int): Boolean {
         return watchListCrossRefDao.getAnimeStateFromWatchList(animeId, watchListTitle)!=null
     }

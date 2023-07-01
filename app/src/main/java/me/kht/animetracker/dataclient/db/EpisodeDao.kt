@@ -1,6 +1,7 @@
 package me.kht.animetracker.dataclient.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -24,4 +25,7 @@ interface EpisodeDao {
 
     @Update
     suspend fun updateEpisodes(episode: List<Episode>)
+
+    @Delete
+    suspend fun deleteEpisodes(episode: List<Episode>)
 }

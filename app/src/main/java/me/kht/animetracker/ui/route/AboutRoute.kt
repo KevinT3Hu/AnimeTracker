@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -150,11 +151,21 @@ fun AboutRoute(viewModel: MainViewModel, rootNavController: NavController, creat
                             CircularProgressIndicator(modifier = Modifier
                                 .progressSemantics()
                                 .size(textHeight))
+                            Spacer(modifier = Modifier.width(5.dp))
                         }
                         Text(
                             text = if (viewModel.databaseRefreshing) stringResource(id = R.string.database_refreshing,viewModel.refreshingProgress,viewModel.refreshingTotal) else stringResource(id = R.string.refresh_database),
                             style = MaterialTheme.typography.titleMedium
                         )
+                    }
+                }
+
+                // clear unused data
+                Card(modifier = cardModifier, onClick = {
+                    viewModel.clearUnusedData(context)
+                }) {
+                    Row(modifier = cardContentModifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = stringResource(R.string.clear_unused_data))
                     }
                 }
 
