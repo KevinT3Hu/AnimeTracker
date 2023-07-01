@@ -20,8 +20,8 @@ android {
         applicationId = "me.kht.animetracker"
         minSdk = 28
         targetSdk = 33
-        versionCode = 18
-        versionName = "v1.4.6"
+        versionCode = 19
+        versionName = "v1.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmmss'Z'")
