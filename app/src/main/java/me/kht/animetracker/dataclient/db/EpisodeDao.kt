@@ -22,6 +22,6 @@ interface EpisodeDao {
     @Query("SELECT * FROM Episode")
     suspend fun getAllEpisodesStatic(): List<Episode>
 
-    @Update(onConflict = OnConflictStrategy.IGNORE)
+    @Update
     suspend fun updateEpisodes(episode: List<Episode>)
 }
