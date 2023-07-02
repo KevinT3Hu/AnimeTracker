@@ -11,7 +11,7 @@ data class AnimeItem(
     val name: String,
     @SerialName("name_cn") val nameCN: String,
     val summary: String,
-    val date: String,
+    val date: String="",
     @Embedded(prefix = "image_") val images: ImageSet,
     val eps: Int,
     @SerialName("total_episodes") val totalEpisodes: Int,
