@@ -219,6 +219,8 @@ class MainViewModel : ViewModel() {
 
     fun updateAnimeLists() {
         CoroutineScope(Dispatchers.IO).launch {
+            episodeNotWatched.clear()
+            animeAirToday.clear()
             allVisibleAnimeAssociatedWithWatchList.collectLatest { animeSet ->
                 animeSet.forEach { animeState ->
                     val episodes = repository.getEpisodesByAnimeId(animeState.animeItem.id)
