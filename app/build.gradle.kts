@@ -20,8 +20,8 @@ android {
         applicationId = "me.kht.animetracker"
         minSdk = 28
         targetSdk = 33
-        versionCode = 20
-        versionName = "v1.5.1"
+        versionCode = 21
+        versionName = "v1.5.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmmss'Z'")
@@ -61,6 +61,7 @@ android {
             isReturnDefaultValues = true
         }
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -70,7 +71,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-    val roomVersion = "2.5.1"
+    val roomVersion = "2.5.2"
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
